@@ -1,5 +1,4 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import LoginLayout from "../layout/Login/LoginLayout.tsx";
 import ProtectedRoute from "../components/Auth/ProtectedRoute.tsx";
 import LoginPage from "../pages/Login/LoginPage.tsx";
 
@@ -12,10 +11,11 @@ const router = createBrowserRouter([
             </ProtectedRoute>
     },
     {
-        Component: LoginLayout,
-        children: [
-            {path: "/Login", Component: LoginPage}
-        ]
+        path: "/Login", Component: LoginPage,
+        action: async ({request}) => {
+            const formData = await request.formData();
+            console.log(formData)
+        }
     }
 ]);
 
