@@ -28,7 +28,7 @@ const useAuth = (): useAuthResult => {
 
     const isAuthenticated = auth.isAuthenticated;
     const hasRole = (role: string) => {
-        return role === auth.user?.role;
+        return role === auth.user?.role?.name;
     }
 
     return {

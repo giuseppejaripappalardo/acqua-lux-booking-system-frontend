@@ -3,7 +3,11 @@ export interface User {
     username: string;
     firstname: string;
     lastname: string;
-    role: string;
+    role: {
+        id: number;
+        name: string;
+        description: string;
+    }
 }
 
 export interface AuthState {

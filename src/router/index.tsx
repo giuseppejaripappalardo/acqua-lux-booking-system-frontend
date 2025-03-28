@@ -11,11 +11,7 @@ const router = createBrowserRouter([
             </ProtectedRoute>
     },
     {
-        path: "/Login", Component: LoginPage,
-        action: async ({request}) => {
-            const formData = await request.formData();
-            console.log(formData)
-        }
+        path: "/Login", Component: LoginPage
     }
 ]);
 

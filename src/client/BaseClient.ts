@@ -1,8 +1,8 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
 
 
 const apiClient: AxiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: import.meta.env.VITE_DEV_ENV === 'DEV' ? '' : import.meta.env.VITE_API_URL,
     timeout: 5000,
     withCredentials: true,
 });
@@ -17,14 +17,16 @@ apiClient.interceptors.response.use(
     }
 );
 
-export const apiGet = <T, P = any>(url: string, params?: P, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
-    return apiClient.get<T>(url, { params, ...config });
+export const baseUrl = "/api/v1";
+
+export const apiGet = <T, P = never>(url: string, params?: P, config?: AxiosRequestConfig): Promise<T> => {
+    return apiClient.get<T>(url, { params, ...config }).then(response => response.data);
 };
 
-export const apiPost = <T, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
-    return apiClient.post<T>(url, data, config);
+export const apiPost = <T, D = never>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> => {
+    return apiClient.post<T>(url, data, config).then(response => response.data);
 };
 
-export const apiDelete = <T, P = any>(url: string, config?: AxiosRequestConfig & { params?: P }): Promise<AxiosResponse<T>> => {
-    return apiClient.delete<T>(url, config);
+export const apiDelete = <T, P = never>(url: string, config?: AxiosRequestConfig & { params?: P }): Promise<T> => {
+    return apiClient.delete<T>(url, config).then(response => response.data);
 };
