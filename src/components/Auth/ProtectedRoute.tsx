@@ -1,5 +1,5 @@
 import * as React from "react";
-import {JSX, useEffect} from "react";
+import {JSX, useEffect, useRef} from "react";
 import useAuth from "../../hooks/useAuth.ts";
 import {Navigate, useLocation} from "react-router-dom";
 
@@ -8,16 +8,23 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}): JSX.Element => {
-    const{isAuthenticated} = useAuth();
+    const {isAuthenticated, checkIsAuthenticated, isLoading} = useAuth();
     const location = useLocation();
+    const authCheckAttempted = useRef(false);
 
-    useEffect( () => {
-        if(!isAuthenticated) {
-            console.log('facciamo redirect')
+
+    useEffect(() => {
+        if (!isAuthenticated && !authCheckAttempted.current) {
+            authCheckAttempted.current = true;
+            checkIsAuthenticated();
         }
-    }, [isAuthenticated])
+    }, [checkIsAuthenticated, isAuthenticated]);
 
-    if(!isAuthenticated && location.pathname !== "/Login") {
+    if (isLoading) {
+        return <></>
+    }
+
+    if (!isAuthenticated && location.pathname !== "/Login" && authCheckAttempted.current) {
         return <Navigate to="/login" replace state={{from: location}}/>
     }
 

@@ -1,8 +1,7 @@
 import {dataDTO} from "../object/DataDto.ts";
+import {BaseResponse} from "./BaseResponse.ts";
 
 
-export interface LoginResponse {
-    success: boolean;
-    message: string;
+export interface LoginResponse extends BaseResponse {
     data: dataDTO
 }

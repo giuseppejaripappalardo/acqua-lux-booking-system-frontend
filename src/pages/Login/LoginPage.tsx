@@ -1,19 +1,14 @@
 import * as React from "react";
 import {useEffect} from "react";
-import {LoginResponse} from "../../models/response/AuthResponse.ts";
-import AuthService from "../../services/Auth/AuthService.ts";
 import {LoginRequest} from "../../models/request/AuthRequest.ts";
 import useAuth from "../../hooks/useAuth.ts";
 import {useNavigate} from "react-router-dom";
-import {MessagesEnum} from "../../utils/MessagesEnumù.ts";
+import {footerText} from "../../utils/MessagesEnum.ts";
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
-    const [submitDisabled, setSubmitDisabled] = React.useState(true);
-    const [errorMessge, setErrorMessge] = React.useState<string>("");
-    const [isLoading, setIsLoading] = React.useState(false);
-    const {isAuthenticated, login, hasRole, logout} = useAuth();
+    const {isAuthenticated, login, isLoading, submitDisabled, errorMessage, setSubmitDisabled} = useAuth();
     const navigate = useNavigate();
 
 
@@ -24,29 +19,12 @@ const LoginPage: React.FC = () => {
      */
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setIsLoading(true);
-        setErrorMessge("");
-        setSubmitDisabled(true);
 
-        try {
-            const loginRequest: LoginRequest = {
-                username,
-                password
-            }
-            const response: LoginResponse = await AuthService.login(loginRequest)
-            setTimeout(() => {
-                login(response.data)
-            }, 300)
-        } catch (ex: unknown) {
-            if (ex instanceof Error) {
-                setErrorMessge(ex.message || MessagesEnum.GENERIC_ERROR);
-            } else {
-                setErrorMessge(MessagesEnum.GENERIC_ERROR)
-            }
-        } finally {
-            setSubmitDisabled(false);
-            setIsLoading(false);
+        const loginRequest: LoginRequest = {
+            username,
+            password
         }
+        login(loginRequest)
     }
 
     useEffect(() => {
@@ -114,6 +92,18 @@ const LoginPage: React.FC = () => {
                             />
                         </div>
 
+                        {
+                            errorMessage ?
+                                <div
+                                    className={"text-red-500 text-left text-sm h-4 bg-black/50 flex justify-center items-center p-5 rounded-md z-20"}>
+                                    {errorMessage}
+                                </div>
+                                :
+                                <div className={"text-red-500 text-sm h-4 rounded-md p-5"}>
+                                </div>
+                        }
+
+
                         <div>
                             <button
                                 type="submit"
@@ -121,7 +111,7 @@ const LoginPage: React.FC = () => {
                                 disabled={submitDisabled}
                             >
                                 {
-                                    isLoading ? "Caricamento..." : "Accedi"
+                                    isLoading ? "Accesso in corso..." : "Accedi"
                                 }
                             </button>
                         </div>
@@ -129,8 +119,7 @@ const LoginPage: React.FC = () => {
                 </div>
 
                 <footer className={"mt-auto align-bottom p-5 bg-black/60 min-w-full text-center text-white z-20"}>
-                    © 2024 AcquaLux | Project Work Universitario - Giuseppe Jari Pappalardo (0312300959)
-                    Università Telematica Pegaso | Informatica per le Aziende Digitali | MIT License
+                    {footerText}
                 </footer>
             </div>
         </div>
