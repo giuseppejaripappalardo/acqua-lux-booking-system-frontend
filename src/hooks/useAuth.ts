@@ -1,6 +1,6 @@
 import {authAtom} from "../store/auth.ts";
 import {useAtom} from "jotai";
-import {AuthState} from "../models/object/AuthState.ts";
+import {AuthState, User} from "../models/object/AuthState.ts";
 import {useState} from "react";
 import AuthService from "../services/Auth/AuthService.ts";
 import {LoginResponse} from "../models/response/AuthResponse.ts";
@@ -17,6 +17,7 @@ interface useAuthResult {
     submitDisabled: boolean;
     setSubmitDisabled: (value: boolean) => void;
     checkIsAuthenticated: () => void;
+    getLoggedUser: () => User | null;
 }
 
 const useAuth = (): useAuthResult => {
@@ -25,11 +26,21 @@ const useAuth = (): useAuthResult => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
 
+
+    const getLoggedUser = (): User | null => {
+        if (!auth.isAuthenticated) {
+            return null;
+        }
+        return auth.user
+    }
+
     const checkIsAuthenticated = async () => {
         // Anche sul check dobbiamo resettare gli status.
         setIsLoading(true);
         setErrorMessge("");
+
         try {
+
             /**
              * Chiedo al backend se ha un cookie con un jwt valido
              * Se è scaduto non ci sarà il cookie e quindi non siamo autenticati.
@@ -53,7 +64,9 @@ const useAuth = (): useAuthResult => {
             console.log(ex)
             await logout()
         } finally {
-            setIsLoading(false);
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 300)
         }
     }
 
@@ -80,9 +93,11 @@ const useAuth = (): useAuthResult => {
             } else {
                 setErrorMessge(MessagesEnum.GENERIC_ERROR)
             }
-            setIsLoading(false);
         } finally {
             setSubmitDisabled(false);
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 300)
         }
     }
 
@@ -90,8 +105,9 @@ const useAuth = (): useAuthResult => {
      * Metodo di utility per effettuare il logout
      */
     const logout = async () => {
+        setIsLoading(true);
+
         try {
-            // Chiamo logout.
             await AuthService.logout()
         } catch (ex: unknown) {
             if (ex instanceof Error) {
@@ -99,8 +115,10 @@ const useAuth = (): useAuthResult => {
             } else {
                 setErrorMessge(MessagesEnum.GENERIC_ERROR)
             }
-            setIsLoading(false);
         } finally {
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 300)
             setSubmitDisabled(false);
         }
         setAuth({
@@ -124,7 +142,8 @@ const useAuth = (): useAuthResult => {
         submitDisabled,
         setSubmitDisabled,
         errorMessage,
-        checkIsAuthenticated
+        checkIsAuthenticated,
+        getLoggedUser
     }
 }
 

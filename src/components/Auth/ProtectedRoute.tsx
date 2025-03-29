@@ -1,7 +1,8 @@
 import * as React from "react";
-import {JSX, useEffect, useRef} from "react";
+import {JSX, useEffect} from "react";
 import useAuth from "../../hooks/useAuth.ts";
 import {Navigate, useLocation} from "react-router-dom";
+import Spinner from "../Layout/Spinner.tsx";
 
 interface ProtectedRouteProps {
     children: JSX.Element;
@@ -10,25 +11,23 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}): JSX.Element => {
     const {isAuthenticated, checkIsAuthenticated, isLoading} = useAuth();
     const location = useLocation();
-    const authCheckAttempted = useRef(false);
-
+    const PUBLIC_ROUTES = ["/login"]
 
     useEffect(() => {
-        if (!isAuthenticated && !authCheckAttempted.current) {
-            authCheckAttempted.current = true;
+        if (!isLoading) {
             checkIsAuthenticated();
         }
-    }, [checkIsAuthenticated, isAuthenticated]);
+    }, [location.pathname]);
+
 
     if (isLoading) {
-        return <></>
+        return <Spinner/>
     }
 
-    if (!isAuthenticated && location.pathname !== "/Login" && authCheckAttempted.current) {
+    if (!isAuthenticated && !PUBLIC_ROUTES.includes(location.pathname.toLowerCase()) && !isLoading) {
         return <Navigate to="/login" replace state={{from: location}}/>
     }
 
     return children
 }
-
 export default ProtectedRoute;
