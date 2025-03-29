@@ -7,7 +7,6 @@ import {useSearchParams} from "react-router-dom";
 import {DateTime} from "luxon";
 import BoatService from "../../services/Boat/BoatService.ts";
 import {SearchAvailableBoatsRequest} from "../../models/request/SearchAvailableBoatsRequest.ts";
-import Spinner from "../../components/Layout/Spinner.tsx";
 
 const SearchAvailability: React.FC = () => {
     const [boats, setBoats] = useState<BoatResponse | null>(null);
