@@ -16,7 +16,6 @@ interface useAuthResult {
     errorMessage: string;
     submitDisabled: boolean;
     setSubmitDisabled: (value: boolean) => void;
-    checkIsAuthenticated: () => void;
     getLoggedUser: () => User | null;
 }
 
@@ -32,42 +31,6 @@ const useAuth = (): useAuthResult => {
             return null;
         }
         return auth.user
-    }
-
-    const checkIsAuthenticated = async () => {
-        // Anche sul check dobbiamo resettare gli status.
-        setIsLoading(true);
-        setErrorMessge("");
-
-        try {
-
-            /**
-             * Chiedo al backend se ha un cookie con un jwt valido
-             * Se è scaduto non ci sarà il cookie e quindi non siamo autenticati.
-             * Se il jwt è scaduto il backend non validerà il jwt nel cookie
-             * In entrambi i casi finiremmo nel blocco catch e a quel punto dobbiamo
-             * rimandare l'utente alla login.
-             */
-            const response = await AuthService.getToken()
-
-            // Se il nostro controllo va a buon fine settiamo nuovamente lo state opportunamente.
-            setAuth({
-                isAuthenticated: true,
-                jwt: response.data.jwt_token,
-                user: response.data.user
-            });
-        } catch (ex) {
-            /**
-             * Se siamo qui è perchè non abbiamo il cookie, oppure non è scaduto o il jwt non è più valido.
-             * Procediamo settando lo state come non autenticati.
-             */
-            console.log(ex)
-            await logout()
-        } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-            }, 300)
-        }
     }
 
     const login = async (auth: LoginRequest) => {
@@ -142,7 +105,6 @@ const useAuth = (): useAuthResult => {
         submitDisabled,
         setSubmitDisabled,
         errorMessage,
-        checkIsAuthenticated,
         getLoggedUser
     }
 }

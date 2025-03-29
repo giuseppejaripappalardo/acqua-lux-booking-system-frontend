@@ -16,8 +16,12 @@ const UserMenu: React.FC = () => {
     useEffect(() => {
         // qui stiamo gestendo le iniziali dell'utente da mostrare nell'avatar.
         if (user) {
+            // prendo il primo carattere
             const firstName = user?.firstname.charAt(0);
+            // anche qui prendiamo il primo carattere.
             const lastName = user?.lastname.charAt(0);
+
+            // A questo punto assegniamo il valore delle due iniziali :)
             setUserInitials(`${firstName}${lastName}`);
         }
     }, [user]);
@@ -53,7 +57,7 @@ const UserMenu: React.FC = () => {
                 <div className="absolute right-0 mt-2 bg-white text-sm rounded shadow-lg w-48 z-50">
                     <button
                         onClick={() => handleLogout()}
-                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                        className="w-full text-left px-4 py-2 font-semibold text-red-600 cursor-pointer"
                     >
                         Logout
                     </button>

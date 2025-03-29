@@ -1,25 +1,26 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import LoginPage from "../pages/Login/LoginPage.tsx";
-import DashboardLayout from "../layouts/DashboardLayout.tsx";
+import DashboardLayout from "../layout/DashboardLayout.tsx";
 import ProtectedRoute from "../components/Auth/ProtectedRoute.tsx";
 import MyBookingsPage from "../pages/MyBookings/MyBookingsPage.tsx";
 import BookingPage from "../pages/Booking/BookingPage.tsx";
-import BoatService from "../services/Boat/BoatService.ts";
+import SearchAvailability from "../pages/SearchAvailability/SearchAvailability.tsx";
 
 const router = createBrowserRouter([
     {
         Component: DashboardLayout,
         children: [
             {
-                index: true,
                 path: "/",
                 element: <ProtectedRoute>
                     <BookingPage/>
                 </ProtectedRoute>,
-                loader: async () => {
-                    return BoatService.getList();
-                },
-                errorElement: <div>Error</div>,
+            },
+            {
+                path: "/search-availability",
+                element: <ProtectedRoute>
+                    <SearchAvailability/>
+                </ProtectedRoute>,
             },
             {
                 path: "/my-bookings",
