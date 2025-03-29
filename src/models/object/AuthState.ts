@@ -12,5 +12,6 @@ export interface User {
 
 export interface AuthState {
     isAuthenticated: boolean;
+    jwt: string | null;
     user: User | null;
 }

@@ -1,4 +1,5 @@
 import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
+import {authAtom} from "../store/auth.ts";
 
 
 const apiClient: AxiosInstance = axios.create({
@@ -6,7 +7,6 @@ const apiClient: AxiosInstance = axios.create({
     timeout: 5000,
     withCredentials: true,
 });
-
 
 // interceptor per fare il catch degli errori.
 apiClient.interceptors.response.use(

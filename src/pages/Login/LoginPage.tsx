@@ -3,21 +3,49 @@ import {useEffect} from "react";
 import {LoginResponse} from "../../models/response/AuthResponse.ts";
 import AuthService from "../../services/Auth/AuthService.ts";
 import {LoginRequest} from "../../models/request/AuthRequest.ts";
+import useAuth from "../../hooks/useAuth.ts";
+import {useNavigate} from "react-router-dom";
+import {MessagesEnum} from "../../utils/MessagesEnumù.ts";
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [submitDisabled, setSubmitDisabled] = React.useState(true);
+    const [errorMessge, setErrorMessge] = React.useState<string>("");
+    const [isLoading, setIsLoading] = React.useState(false);
+    const {isAuthenticated, login, hasRole, logout} = useAuth();
+    const navigate = useNavigate();
 
+
+    /**
+     * Questo metodo viene chiamato al submit del form di login
+     * Si occupa di chiamare il servizio per effetuare la login
+     * Oltre che a gestires diversi stati interni.
+     */
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const loginRequest: LoginRequest = {
-            username,
-            password
-        }
-        const response: LoginResponse = await AuthService.login(loginRequest)
-        if (response) {
-            console.log(response)
+        setIsLoading(true);
+        setErrorMessge("");
+        setSubmitDisabled(true);
+
+        try {
+            const loginRequest: LoginRequest = {
+                username,
+                password
+            }
+            const response: LoginResponse = await AuthService.login(loginRequest)
+            setTimeout(() => {
+                login(response.data)
+            }, 300)
+        } catch (ex: unknown) {
+            if (ex instanceof Error) {
+                setErrorMessge(ex.message || MessagesEnum.GENERIC_ERROR);
+            } else {
+                setErrorMessge(MessagesEnum.GENERIC_ERROR)
+            }
+        } finally {
+            setSubmitDisabled(false);
+            setIsLoading(false);
         }
     }
 
@@ -27,8 +55,18 @@ const LoginPage: React.FC = () => {
         } else {
             setSubmitDisabled(false);
         }
-        console.log(username, password, submitDisabled);
-    }, [username, password, setSubmitDisabled]);
+    }, [username, password, setSubmitDisabled, submitDisabled]);
+
+    /**
+     *  Ho inserito questo use effect per controllare se l'utente
+     *  è già autenticato. Se lo è allora non deve atterrare qui e dobbiamo
+     *  rimandarlo in homepage
+     */
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/")
+        }
+    }, [isAuthenticated, navigate]);
 
     return (
         <div
@@ -38,7 +76,8 @@ const LoginPage: React.FC = () => {
             <div className={"flex flex-col z-20 items-center justify-center h-full"}>
                 <div className="mt-auto bg-black/50 p-10 rounded-lg shadow-2xl 2xl:w-[380px] sm:w-[350px] z-20">
                     <div className="text-center mb-6">
-                        <h1 className="text-3xl font-bold text-white mb-1 font-serif">Acqua<span className={'text-[#D4AF37]'}>Lux</span></h1>
+                        <h1 className="antialiased text-4xl font-bold text-white mb-1 font-serif">Acqua<span
+                            className={'text-[#D4AF37]'}>Lux</span></h1>
                         <p className="text-gray-200 font-light">Accedi al tuo account</p>
                     </div>
 
@@ -81,7 +120,9 @@ const LoginPage: React.FC = () => {
                                 className={`w-full py-3 px-4 bg-[#D4AF37] hover:bg-yellow-600 text-white rounded-md font-medium transition duration-300 disabled:bg-gray-400/60 disabled:hover:bg-gray-400/60 disabled:cursor-not-allowed`}
                                 disabled={submitDisabled}
                             >
-                                Accedi
+                                {
+                                    isLoading ? "Caricamento..." : "Accedi"
+                                }
                             </button>
                         </div>
                     </form>

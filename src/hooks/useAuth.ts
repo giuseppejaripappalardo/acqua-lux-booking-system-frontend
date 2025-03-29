@@ -1,9 +1,11 @@
-import {authAtom} from "../state/auth.ts";
-import { useAtom } from "jotai";
+import {authAtom} from "../store/auth.ts";
+import {useAtom} from "jotai";
 import {AuthState, User} from "../models/object/AuthState.ts";
+import {LoginResponse} from "../models/response/AuthResponse.ts";
+import {LoginRequest} from "../models/request/AuthRequest.ts";
 
 interface useAuthResult {
-    login: (user: User) => void;
+    login: (user: LoginRequest) => void;
     logout: () => void;
     isAuthenticated: boolean;
     hasRole: (role: string) => boolean;
@@ -12,16 +14,18 @@ interface useAuthResult {
 const useAuth = (): useAuthResult => {
     const [auth, setAuth] = useAtom<AuthState>(authAtom)
 
-    const login = (user: User) => {
+    const login = (auth: LoginResponse) => {
         setAuth({
             isAuthenticated: true,
-            user: user
+            jwt: auth.data.jwt_token,
+            user: auth.data.user
         });
     }
 
     const logout = () => {
         setAuth({
             isAuthenticated: false,
+            jwt: null,
             user: null
         });
     }
