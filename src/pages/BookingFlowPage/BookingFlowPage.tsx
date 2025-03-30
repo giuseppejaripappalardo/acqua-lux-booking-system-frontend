@@ -3,9 +3,11 @@ import {useEffect, useState} from "react";
 import BookingFlowSearchStep from "../../components/Booking/BookingFlowSearchStep.tsx";
 import {Boat} from "../../models/object/Boat.ts";
 import {BookingFlowSteps, BookingPaymentMethods} from "../../models/object/Bookings.ts";
-import {BOOKING_STEPS} from "../../utils/Constants.ts";
+import {BOOKING_PAYMENT_METHODS, BOOKING_STEPS} from "../../utils/Constants.ts";
 import BookingFlowPaymentStep from "../../components/Booking/BookingFlowPaymentStep.tsx";
 import BookingOverview from "../../components/Booking/BookingOverview.tsx";
+import ErrorModal from "../../components/Modal/ErrorModal.tsx";
+import {BookingResponse} from "../../models/response/BookingResponse.ts";
 
 export interface BookingFlowState {
     step: BookingFlowSteps;
@@ -13,9 +15,14 @@ export interface BookingFlowState {
     startDate: string;
     endDate: string;
     seats: number;
-    paymentMethod: BookingPaymentMethods | null;
+    notes: string;
+    paymentMethod: BookingPaymentMethods;
     firstRunCompleted: boolean;
     searchAttempt: boolean;
+    changeBoat: boolean;
+    showError: boolean;
+    errorMsg: string;
+    booking: BookingResponse | null;
 }
 
 /**
@@ -34,7 +41,6 @@ export interface BookingFlowState {
  */
 const BookingFlowPage: React.FC = () => {
 
-
     // Di base iniziamo sempre con lo step Search
     const [bookingFlowState, setBookingFlowState] = useState<BookingFlowState>({
         step: BOOKING_STEPS.search,
@@ -42,9 +48,14 @@ const BookingFlowPage: React.FC = () => {
         selectedBoat: null,
         startDate: "",
         endDate: "",
-        paymentMethod: null,
+        notes: "",
+        paymentMethod: BOOKING_PAYMENT_METHODS.BANK_TRANSFER,
         firstRunCompleted: false,
-        searchAttempt: false
+        searchAttempt: false,
+        changeBoat: false,
+        showError: false,
+        errorMsg: "",
+        booking: null
     });
 
     useEffect(() => {
@@ -70,10 +81,32 @@ const BookingFlowPage: React.FC = () => {
                             Riepilogo prenotazione
                         </h2>
                         <BookingOverview flowStateBoat={bookingFlowState} setFlowState={setBookingFlowState}/>
-                        <BookingFlowPaymentStep setFlowState={setBookingFlowState}/>
+                        <BookingFlowPaymentStep setFlowState={setBookingFlowState} flowState={bookingFlowState}/>
                     </div>
                 </div>
             )}
+
+            {
+                bookingFlowState.step === BOOKING_STEPS.confirm &&
+                <div className="mt-6">
+                    <h2 className="font-serif text-[#0A1F44] text-3xl font-bold mb-6">
+                        Prenotazione confermata
+                    </h2>
+                    <p className="text-[#0A1F44] text-lg">
+                        Grazie per aver prenotato con noi.
+                    </p>
+                </div>
+            }
+
+            <ErrorModal
+                open={bookingFlowState.showError}
+                onClose={() => setBookingFlowState(prevState => ({
+                    ...prevState,
+                    showError: false,
+                    errorMsg: ""
+                }))}
+                message={bookingFlowState.errorMsg}
+            />
         </div>
     );
 };

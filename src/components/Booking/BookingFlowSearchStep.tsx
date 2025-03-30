@@ -20,6 +20,12 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const location = useLocation();
 
+    const messages = {
+        ENTER_DATE_TO_SERACH: "Inserisci la data di inizio e fine per effettuare la ricerca delle disponibilità.",
+        CHANGE_DATE_AND_SEARCH: "Cambia le date e clicca sul tasto cerca per verificare le disponibilità.",
+        NOT_FOUND: "Nessuna imbarcazione disponibile per i criteri selezionati.",
+    }
+
     const handleSearch = useCallback(() => {
         if (flowState.startDate === "" || flowState.endDate === "" || isNaN(flowState.seats)) return;
         setIsLoading(true);
@@ -37,7 +43,8 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
         })
         setFlowState(prevState => ({
             ...prevState,
-            searchAttempt: true
+            searchAttempt: true,
+            changeBoat: false,
         }))
     }, [flowState.endDate, flowState.seats, flowState.startDate, setFlowState])
 
@@ -65,7 +72,6 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
         if (flowState.startDate === "") return;
         if (flowState.endDate === "") return;
         if (!flowState.firstRunCompleted) {
-            console.log("qua entro solo la prima volta");
             handleSearch();
 
             setFlowState(prevState => ({
@@ -73,7 +79,20 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
                 firstRunCompleted: true,
             }));
         }
-    }, [flowState.endDate, flowState.firstRunCompleted, flowState.startDate, handleSearch, setFlowState]);
+    }, [flowState, flowState.endDate, flowState.firstRunCompleted, flowState.startDate, handleSearch, setFlowState]);
+
+    /**
+     * Se ChangeBoat è stato flaggato a True, facciamo la ricerca con i valori precedenti
+     * Cosi da consentire all'utente di selezioanre una imbarcazione differente.
+     */
+    useEffect(() => {
+        if (flowState.changeBoat) {
+            console.log(
+                "flowState.changeBoat", flowState.changeBoat)
+            handleSearch();
+        }
+    }, [flowState.changeBoat, handleSearch]);
+
 
     return (
         <div className="w-full max-w-6xl mx-auto px-4">
@@ -114,10 +133,19 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
             {!isLoading && (!boats || boats?.data.length === 0) && (
                 <p className="text-left text-xl text-[#0A1F44] mb-12">
                     {
-                        (!flowState.startDate || !flowState.endDate) || !flowState.searchAttempt ?
-                            "Inserisci la data di inizio e fine per effettuare la ricerca delle disponibilità."
-                            :
-                            "Nessuna imbarcazione disponibile per i criteri selezionati."
+                        flowState.startDate && flowState.endDate && flowState.searchAttempt &&
+                        messages.NOT_FOUND
+                    }
+
+                    {
+                        flowState.startDate && flowState.endDate && !flowState.searchAttempt &&
+                        messages.CHANGE_DATE_AND_SEARCH
+
+                    }
+
+                    {
+                        !flowState.startDate && !flowState.endDate &&
+                        messages.ENTER_DATE_TO_SERACH
                     }
                 </p>
             )}

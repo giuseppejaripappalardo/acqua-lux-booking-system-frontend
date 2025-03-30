@@ -40,6 +40,7 @@ const BookingOverview: React.FC<BookingOverviewProps> = ({flowStateBoat, setFlow
                                     ...prev,
                                     step: BOOKING_STEPS.search,
                                     selectedBoat: null,
+                                    changeBoat: true,
                                 }))
                             }
                             className="mt-4 text-sm underline text-[#0A1F44] hover:text-[#D4AF37]"
@@ -68,8 +69,6 @@ const BookingOverview: React.FC<BookingOverviewProps> = ({flowStateBoat, setFlow
                             ...prev,
                             step: BOOKING_STEPS.search,
                             selectedBoat: null,
-                            startDate: "",
-                            endDate: "",
                             searchAttempt: false
                         }))
                     }
