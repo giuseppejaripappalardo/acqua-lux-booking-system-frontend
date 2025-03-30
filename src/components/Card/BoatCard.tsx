@@ -2,24 +2,23 @@ import * as React from "react";
 import {Boat} from "../../models/object/Boat.ts";
 import {MapPinCheckInside, Users} from "lucide-react";
 import StatusBadge from "./StatusBadge.tsx";
-import {BookingFlowState} from "../../pages/SearchAvailability/BookingFlowPage.tsx";
+import {BookingFlowState} from "../../pages/BookingFlowPage/BookingFlowPage.tsx";
 
 interface BoatCardProps {
     boat: Boat;
     showSelection?: boolean;
     setFlowState?: React.Dispatch<React.SetStateAction<BookingFlowState>>;
-    flowState?: BookingFlowState;
 }
 
-const BoatCard: React.FC<BoatCardProps> = ({boat, showSelection = false, setFlowState = null, flowState = null}) => {
+const BoatCard: React.FC<BoatCardProps> = ({boat, showSelection = false, setFlowState = null}) => {
     const handleBoatSelection = (boat: Boat) => {
         if (!showSelection && boat !== null) return;
 
-        if (setFlowState && flowState && boat !== null) {
-            setFlowState({
-                ...flowState,
+        if (setFlowState && boat !== null) {
+            setFlowState(prevState => ({
+                ...prevState,
                 selectedBoat: boat,
-            });
+            }));
         }
     };
 

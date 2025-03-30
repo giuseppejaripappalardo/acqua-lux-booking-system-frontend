@@ -1,16 +1,27 @@
 import * as React from "react";
-import {useEffect} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {BoatResponse} from "../../models/response/BoatResponse.ts";
 import BoatCard from "../../components/Card/BoatCard.tsx";
 import SearchForm from "../../components/Booking/SearchForm.tsx";
 import BoatService from "../../services/Boat/BoatService.ts";
 import Spinner from "../../components/Layout/Spinner.tsx";
+import {BookingSearchFields} from "../../models/object/Bookings.ts";
+import {DateTime} from "luxon";
+import {stateStdDatetimeFormat, timezone} from "../../utils/DatetimeUtil.ts";
 
 const BookingPage: React.FC = () => {
+    const now = DateTime.now().setZone(timezone);
+    const today = now.plus({hour: 1, minute: 30}).toFormat(stateStdDatetimeFormat);
+
     const [boats, setBoats] = React.useState<BoatResponse>();
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
+    const [flowState, setFlowState] = useState<BookingSearchFields>({
+        startDate: today,
+        endDate: "",
+        seats: 1,
+    })
 
-    useEffect(() => {
+    const retrieveBoats = useCallback(() => {
         setIsLoading(true);
         BoatService.getList().then((boats) => {
             setBoats(boats);
@@ -19,7 +30,11 @@ const BookingPage: React.FC = () => {
             console.log(err);
             setIsLoading(false);
         })
-    }, []);
+    }, [])
+
+    useEffect(() => {
+        retrieveBoats()
+    }, [retrieveBoats]);
 
     return (
         <div>
@@ -34,7 +49,7 @@ const BookingPage: React.FC = () => {
                     <p className="max-w-xl text-white/90 mb-6">
                         Prenota con pochi clic.
                     </p>
-                    <SearchForm/>
+                    <SearchForm flowState={flowState} setFlowState={setFlowState}/>
                 </div>
             </section>
             <div className="text-left my-12 mb-12">

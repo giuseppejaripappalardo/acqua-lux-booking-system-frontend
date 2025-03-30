@@ -2,19 +2,20 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import BookingFlowSearchStep from "../../components/Booking/BookingFlowSearchStep.tsx";
 import {Boat} from "../../models/object/Boat.ts";
-
-
-type BookingFlowSteps = "search" | "payment" | "confirm";
-
-const BOOKING_STEPS: Record<BookingFlowSteps, BookingFlowSteps> = {
-    search: "search",
-    payment: "payment",
-    confirm: "confirm",
-} as const;
+import {BookingFlowSteps, BookingPaymentMethods} from "../../models/object/Bookings.ts";
+import {BOOKING_STEPS} from "../../utils/Constants.ts";
+import BookingFlowPaymentStep from "../../components/Booking/BookingFlowPaymentStep.tsx";
+import BookingOverview from "../../components/Booking/BookingOverview.tsx";
 
 export interface BookingFlowState {
     step: BookingFlowSteps;
     selectedBoat: Boat | null;
+    startDate: string;
+    endDate: string;
+    seats: number;
+    paymentMethod: BookingPaymentMethods | null;
+    firstRunCompleted: boolean;
+    searchAttempt: boolean;
 }
 
 /**
@@ -33,29 +34,46 @@ export interface BookingFlowState {
  */
 const BookingFlowPage: React.FC = () => {
 
+
     // Di base iniziamo sempre con lo step Search
     const [bookingFlowState, setBookingFlowState] = useState<BookingFlowState>({
         step: BOOKING_STEPS.search,
-        selectedBoat: null
+        seats: 1,
+        selectedBoat: null,
+        startDate: "",
+        endDate: "",
+        paymentMethod: null,
+        firstRunCompleted: false,
+        searchAttempt: false
     });
 
     useEffect(() => {
-
-        if (bookingFlowState.step === BOOKING_STEPS.search && bookingFlowState.selectedBoat !== null) {
+        if (bookingFlowState.step === BOOKING_STEPS.search &&
+            bookingFlowState.selectedBoat !== null) {
             setBookingFlowState({
                 ...bookingFlowState,
                 step: BOOKING_STEPS.payment
             });
         }
-
     }, [bookingFlowState]);
 
     return (
-        <div className="max-w-screen-2xl mx-auto px-4">
-            {
-                bookingFlowState.step === BOOKING_STEPS.search &&
+        <div className="w-full mx-auto px-4 pt-8 pb-16">
+            {bookingFlowState.step === BOOKING_STEPS.search && (
                 <BookingFlowSearchStep setFlowState={setBookingFlowState} flowState={bookingFlowState}/>
-            }
+            )}
+
+            {bookingFlowState.step === BOOKING_STEPS.payment && (
+                <div className="mt-6">
+                    <div className="w-full bg-white p-6 rounded-xl shadow-xl space-y-6">
+                        <h2 className="font-serif text-[#0A1F44] text-3xl font-bold mb-6">
+                            Riepilogo prenotazione
+                        </h2>
+                        <BookingOverview flowStateBoat={bookingFlowState} setFlowState={setBookingFlowState}/>
+                        <BookingFlowPaymentStep setFlowState={setBookingFlowState}/>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -4,7 +4,7 @@ import DashboardLayout from "../layout/DashboardLayout.tsx";
 import ProtectedRoute from "../components/Auth/ProtectedRoute.tsx";
 import MyBookingsPage from "../pages/MyBookings/MyBookingsPage.tsx";
 import BookingPage from "../pages/Booking/BookingPage.tsx";
-import BookingFlowPage from "../pages/SearchAvailability/BookingFlowPage.tsx";
+import BookingFlowPage from "../pages/BookingFlowPage/BookingFlowPage.tsx";
 
 const router = createBrowserRouter([
     {
