@@ -2,16 +2,36 @@ import * as React from "react";
 import {Boat} from "../../models/object/Boat.ts";
 import {MapPinCheckInside, Users} from "lucide-react";
 import StatusBadge from "./StatusBadge.tsx";
+import {BookingFlowState} from "../../pages/SearchAvailability/BookingFlowPage.tsx";
 
 interface BoatCardProps {
     boat: Boat;
     showSelection?: boolean;
+    setFlowState?: React.Dispatch<React.SetStateAction<BookingFlowState>>;
+    flowState?: BookingFlowState;
 }
 
-const BoatCard: React.FC<BoatCardProps> = ({boat, showSelection = false}) => {
+const BoatCard: React.FC<BoatCardProps> = ({boat, showSelection = false, setFlowState = null, flowState = null}) => {
+    const handleBoatSelection = (boat: Boat) => {
+        console.log(
+            "handleBoatSelection",
+            boat)
+        if (!showSelection && boat !== null) return;
+
+        if (setFlowState && flowState && boat !== null) {
+            console.log("qui stiamo facendo la selezione")
+            setFlowState({
+                ...flowState,
+                selectedBoat: boat,
+            });
+        }
+    };
+
     return (
         <div
-            className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.01] hover:shadow-xl transition-transform transition-shadow duration-300 ${showSelection ? 'cursor-pointer' : ''}`}>
+            className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.01] hover:shadow-xl transition-transform transition-shadow duration-300 ${showSelection ? 'cursor-pointer' : ''}`}
+            onClick={() => handleBoatSelection(boat)}
+        >
             <img src={boat.image_path} alt={boat.name} className="h-64 sm:h-72 md:h-80 w-full object-cover"/>
             <div className="p-4 space-y-3">
                 <div className="flex justify-between items-start">
@@ -30,9 +50,11 @@ const BoatCard: React.FC<BoatCardProps> = ({boat, showSelection = false}) => {
                     </div>
                 </div>
                 <div className="flex justify-between items-center mt-3">
-                    <span className="text-[#D4AF37] font-semibold text-sm">A partire da {boat.price_per_hour}€/ora</span>
+                    <span
+                        className="text-[#D4AF37] font-semibold text-sm">A partire da {boat.price_per_hour}€/ora</span>
                     {showSelection &&
-                        <button className="bg-[#D4AF37] text-white px-4 py-2 rounded-full cursor-pointer">Prenota</button>
+                        <button
+                            className="bg-[#D4AF37] text-white px-4 py-2 rounded-full cursor-pointer">Prenota</button>
                     }
                 </div>
             </div>

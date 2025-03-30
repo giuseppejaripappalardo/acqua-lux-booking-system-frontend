@@ -1,20 +1,34 @@
+import SearchForm from "./SearchForm.tsx";
+import BoatCard from "../Card/BoatCard.tsx";
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {BoatResponse} from "../../models/response/BoatResponse.ts";
-import BoatCard from "../../components/Card/BoatCard.tsx";
-import SearchForm from "../../components/Booking/SearchForm.tsx";
-import {useSearchParams} from "react-router-dom";
 import {DateTime} from "luxon";
-import BoatService from "../../services/Boat/BoatService.ts";
+import {BoatResponse} from "../../models/response/BoatResponse.ts";
+import {useSearchParams} from "react-router-dom";
 import {SearchAvailableBoatsRequest} from "../../models/request/SearchAvailableBoatsRequest.ts";
+import BoatService from "../../services/Boat/BoatService.ts";
+import {BookingFlowState} from "../../pages/SearchAvailability/BookingFlowPage.tsx";
 
-const SearchAvailability: React.FC = () => {
+interface BookingFlowSearchStepProps {
+    setFlowState: React.Dispatch<React.SetStateAction<BookingFlowState>>;
+    flowState: BookingFlowState;
+}
+
+const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowState, flowState}) => {
+
     const [boats, setBoats] = useState<BoatResponse | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [searchParams] = useSearchParams();
     const [startDate, setStartDate] = useState<string>(searchParams.get("start_date") || "");
     const [endDate, setEndDate] = useState<string>(searchParams.get("end_date") || "");
     const [seats, setSeats] = useState<number>(Number(searchParams.get("seats") || 1));
+
+    const beautifyDatetime = (date: string | null) => {
+        if (!date) {
+            return "Error"
+        }
+        return DateTime.fromFormat(date, "yyyy-MM-dd HH:mm").toFormat("dd/MM/yyyy HH:mm");
+    }
 
     useEffect(() => {
         if (!startDate || !endDate || isNaN(seats)) return;
@@ -33,15 +47,8 @@ const SearchAvailability: React.FC = () => {
         })
     }, [endDate, seats, startDate])
 
-    const beautifyDatetime = (date: string | null) => {
-        if (!date) {
-            return "Error"
-        }
-        return DateTime.fromFormat(date, "yyyy-MM-dd HH:mm").toFormat("dd/MM/yyyy HH:mm");
-    }
-
     return (
-        <div className="max-w-screen-2xl mx-auto px-4">
+        <>
             <section className="pt-8 pb-4">
                 <div className="flex flex-col justify-center">
                     <h1 className="text-2xl font-bold text-[#0A1F44] mb-4 text-left">Modifica i parametri di
@@ -73,7 +80,7 @@ const SearchAvailability: React.FC = () => {
             {!isLoading && boats && boats?.data?.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     {boats.data.map((boat) => (
-                        <BoatCard key={boat.id} boat={boat} showSelection={true}/>
+                        <BoatCard key={boat.id} boat={boat} showSelection={true} setFlowState={setFlowState} flowState={flowState}/>
                     ))}
                 </div>
             )}
@@ -83,8 +90,8 @@ const SearchAvailability: React.FC = () => {
                     Nessuna imbarcazione disponibile per i criteri selezionati.
                 </p>
             )}
-        </div>
+        </>
     );
-};
+}
 
-export default SearchAvailability;
+export default BookingFlowSearchStep;

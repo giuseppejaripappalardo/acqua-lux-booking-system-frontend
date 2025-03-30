@@ -4,7 +4,7 @@ import DashboardLayout from "../layout/DashboardLayout.tsx";
 import ProtectedRoute from "../components/Auth/ProtectedRoute.tsx";
 import MyBookingsPage from "../pages/MyBookings/MyBookingsPage.tsx";
 import BookingPage from "../pages/Booking/BookingPage.tsx";
-import SearchAvailability from "../pages/SearchAvailability/SearchAvailability.tsx";
+import BookingFlowPage from "../pages/SearchAvailability/BookingFlowPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -19,7 +19,7 @@ const router = createBrowserRouter([
             {
                 path: "/search-availability",
                 element: <ProtectedRoute>
-                    <SearchAvailability/>
+                    <BookingFlowPage/>
                 </ProtectedRoute>,
             },
             {
@@ -31,8 +31,11 @@ const router = createBrowserRouter([
         ]
     },
     {
-        index: true,
-        path: "/Login", Component: LoginPage
+        path: "/Login",
+        element:
+            <ProtectedRoute>
+                <LoginPage/>
+            </ProtectedRoute>
     }
 ]);
 

@@ -41,6 +41,11 @@ const LoginPage: React.FC = () => {
      *  rimandarlo in homepage
      */
     useEffect(() => {
+
+        console.log(
+            "isAuthenticated: ",
+            isAuthenticated)
+
         if (isAuthenticated) {
             navigate("/")
         }

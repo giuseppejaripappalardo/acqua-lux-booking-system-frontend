@@ -29,8 +29,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
         AuthService.getToken()
             .then((result) => {
                 if (isMounted && result.data) {
-                    console.log("data result");
-                    console.log(result.data);
                     setAuthState({
                         isAuthenticated: true,
                         jwt: result.data.jwt_token,

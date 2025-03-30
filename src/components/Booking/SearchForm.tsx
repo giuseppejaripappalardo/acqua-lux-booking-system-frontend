@@ -44,8 +44,9 @@ const SearchForm: React.FC<SearchFormProps> = ({
     const handleDatetimeValdation = useCallback((start: DateTimeMaybeValid, end: DateTimeMaybeValid) => {
         setDisableSearch(false);
 
-        if (!start || !end) {
-            setError("Compila entrambe le date.");
+        if (startDate === "" || endDate === "") {
+            setDisableSearch(true);
+            setError("")
             return;
         }
 
@@ -118,9 +119,9 @@ const SearchForm: React.FC<SearchFormProps> = ({
     return (
         <form
             onSubmit={handleSubmit}
-            className={`bg-white/20 backdrop-blur-lg p-6 rounded-md shadow-2xl text-white ${showFull ? '' : 'max-w-4xl'}`}
+            className={`bg-white/20 backdrop-blur-lg p-6 rounded-md shadow-2xl mb-5 text-white ${showFull ? '' : 'max-w-4xl'}`}
         >
-            <div className={"flex flex-col md:flex-row flex-wrap gap-4 w-full mb-5"}>
+            <div className={"flex flex-col md:flex-row flex-wrap gap-4 w-full"}>
                 <div className="flex-1 min-w-[180px]">
                     <label htmlFor="startDate" className="block text-sm font-medium mb-1 text-left">Data inizio</label>
                     <input
@@ -171,8 +172,14 @@ const SearchForm: React.FC<SearchFormProps> = ({
                 </div>
             </div>
 
+            {!error && (
+                // Metto questo placeholder per evitare problemi di Cumulative Layout Shifting
+                <div className="text-red-400 text-sm sm:col-span-4 mt-2 h-4"></div>
+            )}
+
+
             {error && (
-                <div className="text-red-400 text-sm sm:col-span-4 mt-2">
+                <div className="text-red-400 text-sm sm:col-span-4 mt-2 h-4">
                     {error}
                 </div>
             )}
