@@ -105,6 +105,7 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
                     flowState={flowState}
                     setFlowState={setFlowState as React.Dispatch<React.SetStateAction<BookingSearchFields>>}
                     getAvailabilities={handleSearch}
+                    bgDark={true}
                 />
             </section>
 

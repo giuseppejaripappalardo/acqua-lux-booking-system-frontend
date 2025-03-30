@@ -9,9 +9,10 @@ interface SearchFormProps {
     flowState: BookingSearchFields;
     setFlowState: React.Dispatch<React.SetStateAction<BookingSearchFields>>;
     getAvailabilities?: () => void | null;
+    bgDark?: boolean;
 }
 
-const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvailabilities = null}) => {
+const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvailabilities = null, bgDark = false}) => {
     const [error, setError] = useState<string | null>(null);
     const [disableSearch, setDisableSearch] = useState<boolean>(false);
     const navigate = useNavigate();
@@ -90,12 +91,15 @@ const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvai
     return (
         <form
             onSubmit={handleSubmit}
-            className={`bg-white/20 backdrop-blur-lg p-6 rounded-md shadow-2xl mb-5 text-white w-full`}
+            className={`${bgDark ? 'bg-[#0A1F44]' : 'bg-white/20'} backdrop-blur-lg p-6 rounded-md shadow-2xl mb-5 text-white w-full`}
         >
 
-            <p className="text-sm text-white mt-2">
-                Stato validazione: <strong>{disableSearch ? "DISABILITATO" : "OK"}</strong>
-            </p>
+            {/*
+               RIGA INSERITA SOLO PER SCOPO DI DEBUG
+            */}
+            {/*<p className="text-sm text-white mt-2">*/}
+            {/*    Stato validazione: <strong>{disableSearch ? "DISABILITATO" : "OK"}</strong>*/}
+            {/*</p>*/}
 
             <div className={"flex flex-col md:flex-row flex-wrap gap-4 w-full"}>
                 <div className="flex-1 min-w-[180px]">

@@ -2,6 +2,9 @@ import {MapPinCheckInside, Users} from "lucide-react";
 import {BOOKING_STEPS} from "../../utils/Constants.ts";
 import * as React from "react";
 import {BookingFlowState} from "../../pages/BookingFlowPage/BookingFlowPage.tsx";
+import {DateTime} from "luxon";
+import {beautifyDatetime} from "../../utils/DatetimeUtil.ts";
+import useAuth from "../../hooks/useAuth.ts";
 
 interface BookingOverviewProps {
     flowStateBoat: BookingFlowState;
@@ -9,6 +12,48 @@ interface BookingOverviewProps {
 }
 
 const BookingOverview: React.FC<BookingOverviewProps> = ({flowStateBoat, setFlowState}) => {
+
+    const {getLoggedUser} = useAuth();
+    const loggedUser = getLoggedUser();
+
+    /**
+     * Utilizzo questa utility per calcolare il costo totale del noleggio.
+     * Lo stesso calcolo viene fatto lato backend.
+     */
+    const calculateTotalCost = () => {
+        if (!flowStateBoat.selectedBoat?.price_per_hour || !flowStateBoat.startDate || !flowStateBoat.endDate) {
+            return 0;
+        }
+
+        /**
+         * Per poter moltiplicare il costo orario per le ore totali ho bisogno di estrarre le
+         * ore totali previste dal range di date di prenotazione.
+         */
+        const startDateTime = DateTime.fromISO(flowStateBoat.startDate);
+        const endDateTime = DateTime.fromISO(flowStateBoat.endDate);
+
+        if (!startDateTime.isValid || !endDateTime.isValid) {
+            return 0;
+        }
+
+        /**
+         * A questo punto posso calcolare la differenza in ore tra la datatime di fine e la datetime
+         * di inizio prenotazione, cosi da ricavare le ore.
+         * Facciamo un arrotondamento per eccesso come facco sul backend per avere coerenza.
+         */
+        const diffInHours = Math.ceil(endDateTime.diff(startDateTime, 'hours').hours);
+
+
+        /**
+         * Arrivato qui mi basterà semplicemente moltiplicare il numero di ore
+         * per il costo orario dell'imbarcazione.
+         */
+        return diffInHours * flowStateBoat.selectedBoat.price_per_hour;
+    };
+
+    const totalCost = calculateTotalCost();
+
+
     return (
         <>
             {flowStateBoat && flowStateBoat.selectedBoat && (
@@ -53,14 +98,41 @@ const BookingOverview: React.FC<BookingOverviewProps> = ({flowStateBoat, setFlow
 
             <div className="bg-[#F8F9FA] p-4 rounded-md border border-gray-200">
                 <ul className="text-gray-800 space-y-1 text-sm">
+                    {loggedUser && (
+                        <li className="pt-4 border-t border-gray-300 mt-2">
+                            <strong>Prenotato da:</strong>
+                            <div className="text-sm text-gray-700 mt-1">
+                                <p className={"font-bold"}>{loggedUser.firstname} {loggedUser.lastname}</p>
+                            </div>
+                        </li>
+                    )}
                     <li>
                         <strong>Posti:</strong> {flowStateBoat.seats}
                     </li>
                     <li>
-                        <strong>Dal:</strong> {flowStateBoat.startDate}
+                        <strong>Dal:</strong> {beautifyDatetime(flowStateBoat.startDate)}
                     </li>
                     <li>
-                        <strong>Al:</strong> {flowStateBoat.endDate}
+                        <strong>Al:</strong> {beautifyDatetime(flowStateBoat.endDate)}
+                    </li>
+                    <li>
+                        <strong>Prezzo orario: </strong>
+                        {new Intl.NumberFormat('it-IT', {
+                            style: 'currency',
+                            currency: 'EUR',
+                            minimumFractionDigits: 2,
+                        }).format(flowStateBoat.selectedBoat?.price_per_hour ?? 0)}
+                    </li>
+                    <li className="font-semibold text-base pt-2 border-t border-gray-300 mt-2">
+                        <strong>Totale stimato: </strong>
+                        {new Intl.NumberFormat('it-IT', {
+                            style: 'currency',
+                            currency: 'EUR',
+                            minimumFractionDigits: 2,
+                        }).format(totalCost)}
+                        <small className="text-gray-500 block mt-1">
+                            Il costo viene calcolato su ore intere, con arrotondamento per eccesso.
+                        </small>
                     </li>
                 </ul>
                 <button

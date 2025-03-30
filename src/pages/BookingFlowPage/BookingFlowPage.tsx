@@ -7,7 +7,8 @@ import {BOOKING_PAYMENT_METHODS, BOOKING_STEPS} from "../../utils/Constants.ts";
 import BookingFlowPaymentStep from "../../components/Booking/BookingFlowPaymentStep.tsx";
 import BookingOverview from "../../components/Booking/BookingOverview.tsx";
 import ErrorModal from "../../components/Modal/ErrorModal.tsx";
-import {BookingResponse} from "../../models/response/BookingResponse.ts";
+import {Booking} from "../../models/response/BookingResponse.ts";
+import BookingFlowConfirmation from "../../components/Booking/BookingFlowConfirmation.tsx";
 
 export interface BookingFlowState {
     step: BookingFlowSteps;
@@ -22,7 +23,7 @@ export interface BookingFlowState {
     changeBoat: boolean;
     showError: boolean;
     errorMsg: string;
-    booking: BookingResponse | null;
+    booking: Booking | null;
 }
 
 /**
@@ -88,14 +89,7 @@ const BookingFlowPage: React.FC = () => {
 
             {
                 bookingFlowState.step === BOOKING_STEPS.confirm &&
-                <div className="mt-6">
-                    <h2 className="font-serif text-[#0A1F44] text-3xl font-bold mb-6">
-                        Prenotazione confermata
-                    </h2>
-                    <p className="text-[#0A1F44] text-lg">
-                        Grazie per aver prenotato con noi.
-                    </p>
-                </div>
+                <BookingFlowConfirmation flowState={bookingFlowState}/>
             }
 
             <ErrorModal

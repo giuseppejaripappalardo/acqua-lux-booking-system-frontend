@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {BookingFlowState} from "../../pages/BookingFlowPage/BookingFlowPage";
 import {BookingPaymentMethods} from "../../models/object/Bookings";
 import {BOOKING_PAYMENT_METHODS, BOOKING_STEPS} from "../../utils/Constants.ts";
@@ -14,6 +14,7 @@ interface BookingFlowPaymentStepProps {
 
 const BookingFlowPaymentStep: React.FC<BookingFlowPaymentStepProps> = ({setFlowState, flowState}) => {
     const [loading, setLoading] = useState(false);
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,7 +35,7 @@ const BookingFlowPaymentStep: React.FC<BookingFlowPaymentStepProps> = ({setFlowS
 
             setFlowState(prevState => ({
                 ...prevState,
-                booking: response,
+                booking: response.data,
                 step: BOOKING_STEPS.confirm
             }))
 
@@ -49,6 +50,14 @@ const BookingFlowPaymentStep: React.FC<BookingFlowPaymentStepProps> = ({setFlowS
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (flowState.paymentMethod in BOOKING_PAYMENT_METHODS) {
+            setIsSubmitDisabled(false);
+        } else {
+            setIsSubmitDisabled(true);
+        }
+    }, [flowState.paymentMethod]);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 pt-4">
@@ -91,8 +100,8 @@ const BookingFlowPaymentStep: React.FC<BookingFlowPaymentStepProps> = ({setFlowS
             <div className="flex justify-end">
                 <button
                     type="submit"
-                    className="bg-[#D4AF37] hover:bg-yellow-600 text-white px-6 py-2 rounded-md font-medium transition"
-                    disabled={loading}
+                    className="bg-[#D4AF37] hover:bg-yellow-600 text-white px-6 py-2 rounded-md font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={loading || isSubmitDisabled}
                 >
                     {loading ? "Prenotazione in corso..." : "Conferma prenotazione"}
                 </button>

@@ -11,3 +11,9 @@ export const BOOKING_PAYMENT_METHODS: Record<BookingPaymentMethods, BookingPayme
     CASH: "CASH",
     CREDIT_CARD: "CREDIT_CARD",
 }
+
+export const BOOKING_METHODS_TRANSLATIONS: Record<BookingPaymentMethods, string> = {
+    BANK_TRANSFER: "Bonifico bancario",
+    CASH: "Contanti",
+    CREDIT_CARD: "Carta di credito",
+}
