@@ -1,4 +1,3 @@
-// components/UI/ErrorModal.tsx
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import * as React from "react";
