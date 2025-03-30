@@ -4,7 +4,7 @@ import {BookingWithBoat} from "../../models/response/BookingResponse";
 import {beautifyFromIso} from "../../utils/DatetimeUtil.ts";
 import BookingService from "../../services/Booking/BookingService.ts";
 import {Pencil, Trash} from "lucide-react";
-import {BOOKING_METHODS_TRANSLATIONS} from "../../utils/Constants.ts";
+import {BOOKING_METHODS_TRANSLATIONS, BOOKING_STATUSES} from "../../utils/Constants.ts";
 import Spinner from "../../components/Layout/Spinner.tsx";
 
 const MyBookingsPage: React.FC = () => {
@@ -106,24 +106,25 @@ const MyBookingsPage: React.FC = () => {
                                     <div className="mt-2">{renderStatusBadge(booking.reservation_status)}</div>
                                 </div>
 
-                                <div className="flex flex-col gap-3 mt-6 md:mt-0 md:items-end">
-                                    <button
-                                        className="flex items-center gap-2 text-[#0A1F44] hover:text-[#D4AF37] font-medium transition"
+                                {
+                                    booking.reservation_status === BOOKING_STATUSES.CONFIRMED &&
+                                    <div className="flex flex-col gap-3 mt-6 md:mt-0 md:items-end">
+                                        <button
+                                            className="flex items-center gap-2 text-[#0A1F44] hover:text-[#D4AF37] font-medium transition"
 
-                                    >
-                                        <Pencil size={16}/>
-                                        Modifica
-                                    </button>
-                                    <button
-                                        className="flex items-center gap-2 text-red-600 hover:text-red-800 font-medium transition"
+                                        >
+                                            <Pencil size={16}/>
+                                            Modifica
+                                        </button>
+                                        <button
+                                            className="flex items-center gap-2 text-red-600 hover:text-red-800 font-medium transition"
 
-                                    >
-                                        <Trash size={16}/>
-                                        Cancella
-                                    </button>
-                                </div>
-
-
+                                        >
+                                            <Trash size={16}/>
+                                            Cancella
+                                        </button>
+                                    </div>
+                                }
                             </div>
                         ))}
 
@@ -149,7 +150,7 @@ const MyBookingsPage: React.FC = () => {
                 )}
 
             {
-                isLoading && <Spinner />
+                isLoading && <Spinner/>
             }
         </div>
     );
