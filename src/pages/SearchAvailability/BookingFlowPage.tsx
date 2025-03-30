@@ -41,13 +41,11 @@ const BookingFlowPage: React.FC = () => {
 
     useEffect(() => {
 
-        if(bookingFlowState.step === BOOKING_STEPS.search && bookingFlowState.selectedBoat !== null) {
+        if (bookingFlowState.step === BOOKING_STEPS.search && bookingFlowState.selectedBoat !== null) {
             setBookingFlowState({
                 ...bookingFlowState,
                 step: BOOKING_STEPS.payment
             });
-            console.log("Qualcuno ha cambiato flow state");
-            console.log(bookingFlowState);
         }
 
     }, [bookingFlowState]);

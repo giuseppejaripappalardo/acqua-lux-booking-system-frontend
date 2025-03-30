@@ -13,13 +13,9 @@ interface BoatCardProps {
 
 const BoatCard: React.FC<BoatCardProps> = ({boat, showSelection = false, setFlowState = null, flowState = null}) => {
     const handleBoatSelection = (boat: Boat) => {
-        console.log(
-            "handleBoatSelection",
-            boat)
         if (!showSelection && boat !== null) return;
 
         if (setFlowState && flowState && boat !== null) {
-            console.log("qui stiamo facendo la selezione")
             setFlowState({
                 ...flowState,
                 selectedBoat: boat,
