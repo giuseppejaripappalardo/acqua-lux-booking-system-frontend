@@ -7,7 +7,6 @@ interface SearchFormProps {
     initialStartDate?: string;
     initialEndDate?: string;
     initialSeats?: number;
-    showFull?: boolean;
     setSearchStartDate?: (date: string) => void | null;
     setSearchEndDate?: (date: string) => void | null;
     setSearchSeats?: (seats: number) => void | null;
@@ -17,7 +16,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
                                                    initialStartDate = "",
                                                    initialEndDate = "",
                                                    initialSeats = 1,
-                                                   showFull = false,
                                                    setSearchSeats = null,
                                                    setSearchStartDate = null,
                                                    setSearchEndDate = null
@@ -119,7 +117,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
     return (
         <form
             onSubmit={handleSubmit}
-            className={`bg-white/20 backdrop-blur-lg p-6 rounded-md shadow-2xl mb-5 text-white ${showFull ? '' : 'max-w-4xl'}`}
+            className={`bg-white/20 backdrop-blur-lg p-6 rounded-md shadow-2xl mb-5 text-white w-full`}
         >
             <div className={"flex flex-col md:flex-row flex-wrap gap-4 w-full"}>
                 <div className="flex-1 min-w-[180px]">
@@ -131,8 +129,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
                         min={today as string}
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-md bg-white text-black border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37]"
-                    />
+                        className="appearance-none w-full px-4 py-2 border rounded-md bg-white text-black border-gray-300 placeholder-gray-500 text-base font-sans leading-tight focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37]"                    />
                 </div>
 
                 <div className="flex-1 min-w-[180px]">
@@ -144,7 +141,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
                         min={startDate as string || today as string}
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-md bg-white text-black border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37]"
+                        className="appearance-none w-full px-4 py-2 border rounded-md bg-white text-black border-gray-300 placeholder-gray-500 text-base font-sans leading-tight focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37]"
                     />
                 </div>
 

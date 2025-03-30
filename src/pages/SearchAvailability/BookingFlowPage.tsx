@@ -26,7 +26,7 @@ export interface BookingFlowState {
  * Ora se selectedBoat è != null, a quel punto possiamo chiamare il metodo setFlowState che stiamo passando al componente
  * figlio e settare l'imbarcazione selezionata.
  * In questo componente invece lo useEffect ascolta i cambiamenti sul BookingFlowStep. Se viene selezionata una imbarcazione
- * ed il valore è !== null allora lo step avanzerà a paymant, dove mostriamo un form per procedere con la conferma della prenotazione.
+ * e il valore è !== null allora lo step avanzerà a payment, dove mostriamo un form per procedere con la conferma della prenotazione.
  * Se tutto va a buon fine la prenotazione passerà in stato confermato (a prescindere dal metodo di pagamento, che per gli scopi di questo
  * project work sarà soltanto un mock, anche se il dato viene salvato a DB).
  * Lo step finale è uno step di cortesia che mostra un messaggio di conferma.

@@ -22,7 +22,7 @@ const BookingPage: React.FC = () => {
     }, []);
 
     return (
-        <div className="max-w-screen-2xl mx-auto px-4">
+        <div>
             <section
                 className="relative h-[65vh] bg-background md:bg-[url('./../../assets/images/yacht_luxury.jpg')] bg-center bg-cover rounded-md">
                 <div className="absolute inset-0 bg-black/40 rounded-md"/>

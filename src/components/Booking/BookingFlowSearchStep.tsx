@@ -57,7 +57,6 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
                         initialStartDate={startDate ?? ""}
                         initialEndDate={endDate ?? ""}
                         initialSeats={seats || 1}
-                        showFull={true}
                         setSearchStartDate={setStartDate}
                         setSearchEndDate={setEndDate}
                         setSearchSeats={setSeats}

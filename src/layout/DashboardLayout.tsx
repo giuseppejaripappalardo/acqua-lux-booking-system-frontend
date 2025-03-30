@@ -16,7 +16,7 @@ const DashboardLayout = () => {
     return (
         <div className={"flex flex-col min-h-screen bg-[#F8F9FA]"}>
             <NavBar items={navBarItems}/>
-            <main className={"flex-grow"}>
+            <main className={"flex-grow container mx-auto px-6 py-4"}>
                 <Outlet/>
             </main>
             <Footer/>
