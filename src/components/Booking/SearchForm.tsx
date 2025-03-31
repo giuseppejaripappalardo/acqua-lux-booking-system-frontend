@@ -15,10 +15,13 @@ interface SearchFormProps {
 const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvailabilities = null, bgDark = false}) => {
     const [error, setError] = useState<string | null>(null);
     const [disableSearch, setDisableSearch] = useState<boolean>(false);
+    const [editModeFirstAttempt, setEditModeFirstAttempt] = useState<boolean>(false);
     const navigate = useNavigate();
     const location = useLocation();
 
-    const today = DateTime.now().setZone(timezone).toFormat(stateStdDatetimeFormat);
+    // da backend il controllo deve avere almeno un buffer di 1 ora dall'ora corrente.
+    // Per evitare errori di validazione settando 1 ora, settiamo 1h e 5 come buffer minimo.
+    const today = DateTime.now().setZone(timezone).plus({hour: 1}).toFormat(stateStdDatetimeFormat);
 
     const handleDatetimeValidation = useCallback((start: DateTimeMaybeValid, end: DateTimeMaybeValid) => {
         const now = DateTime.now().setZone(timezone);
@@ -59,7 +62,8 @@ const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvai
         handleDatetimeValidation(start, end);
 
         const locationMatch = location.pathname.toLowerCase() === "/search-availability";
-        if (!locationMatch) {
+        console.log(flowState.isEditMode)
+        if (!locationMatch && !flowState.isEditMode) {
             navigate('/search-availability', {
                 state: {
                     searched_start_date: start.toFormat(stateStdDatetimeFormat),
@@ -82,10 +86,21 @@ const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvai
     };
 
     useEffect(() => {
+        if (flowState.isEditMode && !editModeFirstAttempt) {
+            console.log("la prima volta skippo")
+            setEditModeFirstAttempt(true);
+            /* bypassiamo il controllo. Il motivo dello skip è che se per qualche motivo
+                 La data di inizio è precedente, partirebbe la chiamata con relativo modal
+                di errore, in quanto la ricerca non si può fare a posteriori.
+                 Skippo solo per correttezza visuale, anche se poi di base la modifica
+                 della prenotazione prevede opportuni controlli di validazione.
+             */
+            return
+        }
         const start = DateTime.fromISO(flowState.startDate, {zone: timezone});
         const end = DateTime.fromISO(flowState.endDate, {zone: timezone});
         handleDatetimeValidation(start, end);
-    }, [flowState.startDate, flowState.endDate, handleDatetimeValidation]);
+    }, [flowState.startDate, flowState.endDate, handleDatetimeValidation, flowState.isEditMode]);
 
 
     return (

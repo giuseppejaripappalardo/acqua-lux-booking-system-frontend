@@ -7,7 +7,7 @@ import {BOOKING_PAYMENT_METHODS, BOOKING_STEPS} from "../../utils/Constants.ts";
 import BookingFlowPaymentStep from "../../components/Booking/BookingFlowPaymentStep.tsx";
 import BookingOverview from "../../components/Booking/BookingOverview.tsx";
 import ErrorModal from "../../components/Modal/ErrorModal.tsx";
-import {Booking} from "../../models/response/BookingResponse.ts";
+import {BookingWithBoat} from "../../models/response/BookingResponse.ts";
 import BookingFlowConfirmation from "../../components/Booking/BookingFlowConfirmation.tsx";
 
 export interface BookingFlowState {
@@ -21,9 +21,16 @@ export interface BookingFlowState {
     firstRunCompleted: boolean;
     searchAttempt: boolean;
     changeBoat: boolean;
-    showError: boolean;
-    errorMsg: string;
-    booking: Booking | null;
+    showErrorModal: boolean;
+    modalErrorMsg: string;
+    modalHideCloseButton: boolean;
+    modalPrimaryButton: {
+        link: string;
+        label: string;
+    } | null;
+    booking: BookingWithBoat | null;
+    isEditMode: boolean;
+    originalBooking: BookingWithBoat | null;
 }
 
 /**
@@ -54,9 +61,13 @@ const BookingFlowPage: React.FC = () => {
         firstRunCompleted: false,
         searchAttempt: false,
         changeBoat: false,
-        showError: false,
-        errorMsg: "",
-        booking: null
+        showErrorModal: false,
+        modalErrorMsg: "",
+        modalPrimaryButton: null,
+        modalHideCloseButton: false,
+        booking: null,
+        isEditMode: false,
+        originalBooking: null,
     });
 
     useEffect(() => {
@@ -93,13 +104,13 @@ const BookingFlowPage: React.FC = () => {
             }
 
             <ErrorModal
-                open={bookingFlowState.showError}
+                open={bookingFlowState.showErrorModal}
                 onClose={() => setBookingFlowState(prevState => ({
                     ...prevState,
-                    showError: false,
-                    errorMsg: ""
+                    showErrorModal: false,
+                    modalErrorMsg: ""
                 }))}
-                message={bookingFlowState.errorMsg}
+                message={bookingFlowState.modalErrorMsg}
             />
         </div>
     );

@@ -3,9 +3,10 @@ import {useEffect, useState} from "react";
 import {BookingFlowState} from "../../pages/BookingFlowPage/BookingFlowPage";
 import {BookingPaymentMethods} from "../../models/object/Bookings";
 import {BOOKING_PAYMENT_METHODS, BOOKING_STEPS} from "../../utils/Constants.ts";
-import {BookingRequest} from "../../models/request/BookingRequest.ts";
+import {BookingRequest, EditBookingRequest} from "../../models/request/BookingRequest.ts";
 import BookingService from "../../services/Booking/BookingService.ts";
 import {AxiosError} from "axios";
+import {BookingViewResponse} from "../../models/response/BookingResponse.ts";
 
 interface BookingFlowPaymentStepProps {
     setFlowState: React.Dispatch<React.SetStateAction<BookingFlowState>>;
@@ -16,35 +17,81 @@ const BookingFlowPaymentStep: React.FC<BookingFlowPaymentStepProps> = ({setFlowS
     const [loading, setLoading] = useState(false);
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
+    const submitEdit = async () => {
+        const bookingRequest: EditBookingRequest = {
+            booking_id: flowState.originalBooking!.id,
+            start_date: flowState.startDate,
+            end_date: flowState.endDate,
+            seat: flowState.seats,
+            notes: flowState.notes,
+            payment_method: flowState.paymentMethod,
+            boat_id: flowState.selectedBoat!.id
+        }
+        return await BookingService.editBooking(bookingRequest)
+    }
+
+    const submitRequest = async (): Promise<BookingViewResponse> => {
+        if (!flowState.selectedBoat) {
+            setFlowState(prevState => ({
+                    ...prevState,
+                    modalErrorMsg: "Si è verificato un errore imprevisto. Si prega di riprovare.",
+                    showErrorModal: true,
+                })
+            );
+        }
+        const bookingRequest: BookingRequest = {
+            start_date: flowState.startDate,
+            end_date: flowState.endDate,
+            seat: flowState.seats,
+            notes: flowState.notes,
+            payment_method: flowState.paymentMethod,
+            boat_id: flowState.selectedBoat!.id
+        }
+        return await BookingService.addBooking(bookingRequest)
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        console.log(flowState.selectedBoat)
+        console.log(flowState.originalBooking)
+        if (!flowState.selectedBoat && !flowState.originalBooking) {
+            console.log("entro qui!")
+            setFlowState(prevState => ({
+                    ...prevState,
+                    modalErrorMsg: "Si è verificato un errore imprevisto. Si prega di riprovare.",
+                    showErrorModal: true,
+                })
+            );
+            return;
+        }
+
+        let response: BookingViewResponse;
+
         try {
             setLoading(true);
-            if (!flowState.selectedBoat) return;
 
-            const bookingRequest: BookingRequest = {
-                start_date: flowState.startDate,
-                end_date: flowState.endDate,
-                seat: flowState.seats,
-                notes: flowState.notes,
-                payment_method: flowState.paymentMethod,
-                boat_id: flowState.selectedBoat?.id
+
+            if (flowState.isEditMode) {
+                console.log('Modifichiamo prenotazione.');
+                response = await submitEdit()
+            } else {
+                console.log('Effettuiamo prenotazione.');
+                response = await submitRequest()
             }
-            const response = await BookingService.addBooking(bookingRequest)
 
             setFlowState(prevState => ({
                 ...prevState,
                 booking: response.data,
                 step: BOOKING_STEPS.confirm
-            }))
+            }));
 
         } catch (err) {
             const error = err as AxiosError;
             setFlowState(prevState => ({
                 ...prevState,
-                errorMsg: error.message,
-                showError: true,
+                modalErrorMsg: error.message,
+                showErrorModal: true,
             }))
         } finally {
             setLoading(false);
@@ -100,7 +147,7 @@ const BookingFlowPaymentStep: React.FC<BookingFlowPaymentStepProps> = ({setFlowS
             <div className="flex justify-end">
                 <button
                     type="submit"
-                    className="bg-[#D4AF37] hover:bg-yellow-600 text-white px-6 py-2 rounded-md font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-[#D4AF37] hover:bg-yellow-600 text-white px-6 py-2 rounded-md font-medium transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     disabled={loading || isSubmitDisabled}
                 >
                     {loading ? "Prenotazione in corso..." : "Conferma prenotazione"}

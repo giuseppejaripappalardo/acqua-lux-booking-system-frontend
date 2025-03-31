@@ -3,6 +3,7 @@ import {SearchAvailableBoatsRequest} from "../../models/request/SearchAvailableB
 import {BoatResponse} from "../../models/response/BoatResponse.ts";
 import {MessagesEnum} from "../../utils/MessagesEnum.ts";
 import {AxiosError} from "axios";
+import {ErrorResponse} from "../../models/response/ErrorResponse.ts";
 
 class BoatService {
 
@@ -23,7 +24,8 @@ class BoatService {
             return await apiPost<BoatResponse, SearchAvailableBoatsRequest>(BoatService.getAvailableBoats, request)
         } catch (ex) {
             const error = ex as AxiosError;
-            throw new Error(error.message || MessagesEnum.GENERIC_ERROR);
+            const errorData = error?.response?.data as ErrorResponse;
+            throw new Error(errorData?.message || MessagesEnum.GENERIC_ERROR);
         }
     }
 }

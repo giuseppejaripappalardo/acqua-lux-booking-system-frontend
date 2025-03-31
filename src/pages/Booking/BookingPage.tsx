@@ -36,6 +36,10 @@ const BookingPage: React.FC = () => {
         retrieveBoats()
     }, [retrieveBoats]);
 
+    if (isLoading) {
+        return <Spinner/>;
+    }
+
     return (
         <div>
             <section
@@ -66,10 +70,6 @@ const BookingPage: React.FC = () => {
                 {
                     !isLoading && boats &&
                     boats?.data.map(boat => <BoatCard key={boat.id} boat={boat}/>)
-                }
-
-                {
-                    isLoading && <Spinner/>
                 }
 
                 {

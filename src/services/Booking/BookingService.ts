@@ -1,18 +1,40 @@
 import {apiGet, apiPost, baseUrl} from "../../client/BaseClient.ts";
 import {MessagesEnum} from "../../utils/MessagesEnum.ts";
 import {AxiosError} from "axios";
-import {BookingRequest} from "../../models/request/BookingRequest.ts";
-import {BookingResponse, BookingsListResponse} from "../../models/response/BookingResponse.ts";
+import {BookingRequest, EditBookingRequest, ViewBooking} from "../../models/request/BookingRequest.ts";
+import {BookingsListResponse, BookingViewResponse} from "../../models/response/BookingResponse.ts";
 import {ErrorResponse} from "../../models/response/ErrorResponse.ts";
 
 class BookingService {
 
     static addBookingAction = `${baseUrl}/bookings/add`;
+    static editBookingAction = `${baseUrl}/bookings/edit`;
     static getReservationList = `${baseUrl}/bookings/list`;
+    static getReservationView = `${baseUrl}/bookings/view`;
 
-    static async addBooking(bookingData: BookingRequest): Promise<BookingResponse> {
+    static async addBooking(bookingData: BookingRequest): Promise<BookingViewResponse> {
         try {
-            return await apiPost<BookingResponse, BookingRequest>(BookingService.addBookingAction, bookingData)
+            return await apiPost<BookingViewResponse, BookingRequest>(BookingService.addBookingAction, bookingData)
+        } catch (ex) {
+            const error = ex as AxiosError;
+            const errorData = error?.response?.data as ErrorResponse;
+            throw new Error(errorData?.message || MessagesEnum.GENERIC_ERROR);
+        }
+    }
+
+    static async editBooking(bookingData: EditBookingRequest): Promise<BookingViewResponse> {
+        try {
+            return await apiPost<BookingViewResponse, EditBookingRequest>(BookingService.editBookingAction, bookingData)
+        } catch (ex) {
+            const error = ex as AxiosError;
+            const errorData = error?.response?.data as ErrorResponse;
+            throw new Error(errorData?.message || MessagesEnum.GENERIC_ERROR);
+        }
+    }
+
+    static async getReservation(booking: ViewBooking): Promise<BookingViewResponse> {
+        try {
+            return await apiGet<BookingViewResponse, ViewBooking>(BookingService.getReservationView, booking)
         } catch (ex) {
             const error = ex as AxiosError;
             const errorData = error?.response?.data as ErrorResponse;

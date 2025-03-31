@@ -10,7 +10,7 @@ import Footer from "../components/Layout/Footer.tsx";
 const DashboardLayout = () => {
     const navBarItems: NavBarItem[] = [
         {name: "Home", link: "/"},
-        {name: "Prenotazioni", link: "/my-bookings"},
+        {name: "Le mie prenotazioni", link: "/my-bookings"},
     ];
 
     return (

@@ -8,3 +8,12 @@ export interface BookingRequest {
     notes: string;
     payment_method: BookingPaymentMethods
 }
+
+
+export interface ViewBooking {
+    booking_id: number
+}
+
+export interface EditBookingRequest extends BookingRequest{
+    booking_id: number;
+}

@@ -5,6 +5,7 @@ import {BookingFlowState} from "../../pages/BookingFlowPage/BookingFlowPage.tsx"
 import {DateTime} from "luxon";
 import {beautifyDatetime} from "../../utils/DatetimeUtil.ts";
 import useAuth from "../../hooks/useAuth.ts";
+import {formatCurrency} from "../../utils/CurrencyUtil.ts";
 
 interface BookingOverviewProps {
     flowStateBoat: BookingFlowState;
@@ -42,15 +43,12 @@ const BookingOverview: React.FC<BookingOverviewProps> = ({flowStateBoat, setFlow
          * Facciamo un arrotondamento per eccesso come facco sul backend per avere coerenza.
          */
         const diffInHours = Math.ceil(endDateTime.diff(startDateTime, 'hours').hours);
-
-
         /**
          * Arrivato qui mi basterà semplicemente moltiplicare il numero di ore
          * per il costo orario dell'imbarcazione.
          */
         return diffInHours * flowStateBoat.selectedBoat.price_per_hour;
     };
-
     const totalCost = calculateTotalCost();
 
 
@@ -117,23 +115,54 @@ const BookingOverview: React.FC<BookingOverviewProps> = ({flowStateBoat, setFlow
                     </li>
                     <li>
                         <strong>Prezzo orario: </strong>
-                        {new Intl.NumberFormat('it-IT', {
-                            style: 'currency',
-                            currency: 'EUR',
-                            minimumFractionDigits: 2,
-                        }).format(flowStateBoat.selectedBoat?.price_per_hour ?? 0)}
+                        {formatCurrency(flowStateBoat.selectedBoat?.price_per_hour ?? 0)}
                     </li>
                     <li className="font-semibold text-base pt-2 border-t border-gray-300 mt-2">
                         <strong>Totale stimato: </strong>
-                        {new Intl.NumberFormat('it-IT', {
-                            style: 'currency',
-                            currency: 'EUR',
-                            minimumFractionDigits: 2,
-                        }).format(totalCost)}
+                        {formatCurrency(totalCost)}
                         <small className="text-gray-500 block mt-1">
                             Il costo viene calcolato su ore intere, con arrotondamento per eccesso.
                         </small>
                     </li>
+
+                    {
+                        flowStateBoat.isEditMode && flowStateBoat.originalBooking && (
+                            <div className="mt-4 p-4 border rounded-md bg-white shadow-sm">
+                                <h4 className="text-md font-semibold text-[#0A1F44] mb-2">Dettagli Modifica</h4>
+                                {(() => {
+                                    const oldPrice = flowStateBoat.originalBooking!.total_price;
+                                    const priceDiff = totalCost - oldPrice;
+
+                                    if (priceDiff > 0) {
+                                        return (
+                                            <p className="text-sm text-yellow-700">
+                                                La nuova prenotazione ha un costo maggiore di {" "}
+                                                <strong>
+                                                    {formatCurrency(priceDiff)}
+                                                </strong>.
+                                                Ti sarà richiesto di saldare la differenza.
+                                            </p>
+                                        );
+                                    } else if (priceDiff < 0) {
+                                        return (
+                                            <p className="text-sm text-green-700">
+                                                La nuova prenotazione ha un costo inferiore di {" "}
+                                                <strong>
+                                                    {formatCurrency(Math.abs(priceDiff))}
+                                                </strong>. Riceverai un rimborso.
+                                            </p>
+                                        );
+                                    } else {
+                                        return (
+                                            <p className="text-sm text-gray-700">
+                                                Nessun importo aggiuntivo da saldare.
+                                            </p>
+                                        );
+                                    }
+                                })()}
+                            </div>
+                        )
+                    }
                 </ul>
                 <button
                     onClick={() =>

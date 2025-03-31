@@ -5,4 +5,5 @@ export interface BookingSearchFields {
     startDate: string;
     endDate: string;
     seats: number;
+    isEditMode?: boolean
 }

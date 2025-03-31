@@ -5,6 +5,7 @@ import ProtectedRoute from "../components/Auth/ProtectedRoute.tsx";
 import MyBookingsPage from "../pages/MyBookings/MyBookingsPage.tsx";
 import BookingPage from "../pages/Booking/BookingPage.tsx";
 import BookingFlowPage from "../pages/BookingFlowPage/BookingFlowPage.tsx";
+import EditBookingFlowPage from "../pages/EditBookingFlowPage/EditBookingFlowPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -20,6 +21,12 @@ const router = createBrowserRouter([
                 path: "/search-availability",
                 element: <ProtectedRoute>
                     <BookingFlowPage/>
+                </ProtectedRoute>,
+            },
+            {
+                path: "/edit-booking/:id",
+                element: <ProtectedRoute>
+                    <EditBookingFlowPage/>
                 </ProtectedRoute>,
             },
             {

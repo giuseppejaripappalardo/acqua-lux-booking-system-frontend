@@ -14,17 +14,20 @@ interface BookingFlowSearchStepProps {
     flowState: BookingFlowState;
 }
 
+const messages = {
+    ENTER_DATE_TO_SERACH: "Inserisci la data di inizio e fine per effettuare la ricerca delle disponibilità.",
+    CHANGE_DATE_AND_SEARCH: "Cambia le date e clicca sul tasto cerca per verificare le disponibilità.",
+    NOT_FOUND: "Nessuna imbarcazione disponibile per i criteri selezionati.",
+    EDIT_MODE_MESSAGE: "Inserisci le date, verifica la disponibilità per procedere alla modifica richiesta."
+}
+
 const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowState, flowState}) => {
 
     const [boats, setBoats] = useState<BoatResponse | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [resultMessage, setResultMessage] = useState<string>(flowState.isEditMode ? messages.EDIT_MODE_MESSAGE : messages.ENTER_DATE_TO_SERACH);
     const location = useLocation();
 
-    const messages = {
-        ENTER_DATE_TO_SERACH: "Inserisci la data di inizio e fine per effettuare la ricerca delle disponibilità.",
-        CHANGE_DATE_AND_SEARCH: "Cambia le date e clicca sul tasto cerca per verificare le disponibilità.",
-        NOT_FOUND: "Nessuna imbarcazione disponibile per i criteri selezionati.",
-    }
 
     const handleSearch = useCallback(() => {
         if (flowState.startDate === "" || flowState.endDate === "" || isNaN(flowState.seats)) return;
@@ -37,8 +40,16 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
         BoatService.searchAvailableBoats(SearchRequest).then((boats) => {
             setBoats(boats);
             setIsLoading(false);
+            if (boats && boats.data.length === 0) {
+                setResultMessage(messages.NOT_FOUND);
+            }
         }).catch((err) => {
-            console.log(err);
+            setFlowState(prevState => ({
+                ...prevState,
+                showErrorModal: true,
+                modalErrorMsg: err.message,
+            }));
+        }).finally(() => {
             setIsLoading(false);
         })
         setFlowState(prevState => ({
@@ -46,7 +57,7 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
             searchAttempt: true,
             changeBoat: false,
         }))
-    }, [flowState.endDate, flowState.seats, flowState.startDate, setFlowState])
+    }, [flowState, setFlowState])
 
     useEffect(() => {
         // Controlliamo come prima cosa che lo state principale non abbia già dei valori.
@@ -59,7 +70,6 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
         const {searched_start_date, searched_end_date, searched_seats} = location.state;
         if (!searched_start_date || !searched_end_date || isNaN(searched_seats)) return;
 
-        console.log("ci rientro?")
         setFlowState(prevState => ({
             ...prevState,
             startDate: searched_start_date,
@@ -71,7 +81,11 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
     useEffect(() => {
         if (flowState.startDate === "") return;
         if (flowState.endDate === "") return;
+        console.log("Mi fermo qua")
+        if (flowState.isEditMode) return;
+        console.log("sono oltre l'edit mode.")
         if (!flowState.firstRunCompleted) {
+            console.log("ci sto entrando come è corretto che sia!")
             handleSearch();
 
             setFlowState(prevState => ({
@@ -79,7 +93,7 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
                 firstRunCompleted: true,
             }));
         }
-    }, [flowState, flowState.endDate, flowState.firstRunCompleted, flowState.startDate, handleSearch, setFlowState]);
+    }, [flowState.isEditMode, flowState.endDate, flowState.firstRunCompleted, flowState.startDate, handleSearch, setFlowState]);
 
     /**
      * Se ChangeBoat è stato flaggato a True, facciamo la ricerca con i valori precedenti
@@ -95,7 +109,7 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
 
 
     return (
-        <div className="w-full max-w-6xl mx-auto px-4">
+        <div className="w-full mx-auto px-4">
             <section className="pt-10 pb-6">
                 <h1 className="text-2xl font-bold text-[#0A1F44] mb-4 font-sans">
                     Modifica i parametri di ricerca
@@ -133,21 +147,7 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
             )}
             {!isLoading && (!boats || boats?.data.length === 0) && (
                 <p className="text-left text-xl text-[#0A1F44] mb-12">
-                    {
-                        flowState.startDate && flowState.endDate && flowState.searchAttempt &&
-                        messages.NOT_FOUND
-                    }
-
-                    {
-                        flowState.startDate && flowState.endDate && !flowState.searchAttempt &&
-                        messages.CHANGE_DATE_AND_SEARCH
-
-                    }
-
-                    {
-                        !flowState.startDate && !flowState.endDate &&
-                        messages.ENTER_DATE_TO_SERACH
-                    }
+                    {resultMessage}
                 </p>
             )}
         </div>

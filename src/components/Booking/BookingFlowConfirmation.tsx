@@ -3,6 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {BookingFlowState} from "../../pages/BookingFlowPage/BookingFlowPage.tsx";
 import {beautifyDatetime} from "../../utils/DatetimeUtil.ts";
 import {BOOKING_METHODS_TRANSLATIONS} from "../../utils/Constants.ts";
+import {formatCurrency} from "../../utils/CurrencyUtil.ts";
 
 interface BookingFlowConfirmationProps {
     flowState: BookingFlowState
@@ -19,7 +20,9 @@ const BookingFlowConfirmation: React.FC<BookingFlowConfirmationProps> = ({flowSt
         <div className="w-full max-w-4xl mx-auto px-4 pt-10 pb-16">
             <div className="bg-white shadow-xl rounded-xl p-8 space-y-6">
                 <h2 className="font-serif text-[#0A1F44] text-3xl font-bold">
-                    Prenotazione confermata!
+                    {
+                        flowState.isEditMode ? "Modifica confermata!" : "Prenotazione confermata!"
+                    }
                 </h2>
 
                 <div className="text-[#0A1F44]">
@@ -40,11 +43,7 @@ const BookingFlowConfirmation: React.FC<BookingFlowConfirmationProps> = ({flowSt
                         <p><strong>Nome:</strong> {selectedBoat.name}</p>
                         <p><strong>Luogo:</strong> {selectedBoat.location}</p>
                         <p><strong>Prezzo orario: </strong>
-                            {new Intl.NumberFormat('it-IT', {
-                                style: 'currency',
-                                currency: 'EUR',
-                                minimumFractionDigits: 2,
-                            }).format(selectedBoat.price_per_hour ?? 0)}
+                            {formatCurrency(selectedBoat.price_per_hour ?? 0)}
                         </p>
                     </div>
 
@@ -55,11 +54,7 @@ const BookingFlowConfirmation: React.FC<BookingFlowConfirmationProps> = ({flowSt
                         <p><strong>Posti:</strong> {seats}</p>
                         <p><strong>Metodo di pagamento:</strong> {BOOKING_METHODS_TRANSLATIONS[booking.payment_method]}</p>
                         <p><strong>Totale: </strong>
-                            {new Intl.NumberFormat('it-IT', {
-                                style: 'currency',
-                                currency: 'EUR',
-                                minimumFractionDigits: 2,
-                            }).format(booking.total_price)}
+                            {formatCurrency(booking.total_price)}
                         </p>
                     </div>
                 </div>
@@ -74,7 +69,7 @@ const BookingFlowConfirmation: React.FC<BookingFlowConfirmationProps> = ({flowSt
                 <div className="flex justify-end pt-6 border-t">
                     <button
                         onClick={() => navigate("/my-bookings")}
-                        className="bg-[#D4AF37] hover:bg-yellow-600 text-white px-6 py-3 rounded-md font-medium transition"
+                        className="bg-[#D4AF37] hover:bg-yellow-600 text-white px-6 py-3 rounded-md font-medium transition cursor-pointer"
                     >
                         Vai alle mie prenotazioni
                     </button>

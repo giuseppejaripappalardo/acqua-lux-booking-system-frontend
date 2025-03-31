@@ -11,8 +11,27 @@ export const beautifyFromIso = (date: string | null) => {
     if (!date) {
         return "Error"
     }
-    return DateTime.fromISO(date).toFormat("dd/MM/yyyy HH:mm");
+    return DateTime.fromISO(date, {
+        zone: "utc"
+    }).setZone(timezone).toFormat("dd/MM/yyyy HH:mm");
 }
+
+export const parseUtcToLocal = (date: string | null) => {
+    if (!date) {
+        return "";
+    }
+    const localDateTime = DateTime.fromISO(date, {
+        zone: "utc"
+    }).setZone(timezone);
+
+    if (!localDateTime.isValid) {
+        return "";
+    }
+
+    return localDateTime.toFormat("yyyy-MM-dd'T'HH:mm");
+}
+
+
 
 export const stateStdDatetimeFormat = "yyyy-MM-dd'T'HH:mm";
 export const timezone = "Europe/Rome"

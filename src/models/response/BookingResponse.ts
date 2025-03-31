@@ -14,7 +14,7 @@ export interface Booking {
     notes: string;
     total_price: number;
     reservation_code: string;
-    price_difference: string;
+    price_difference: number;
     requires_refund: boolean;
     payment_method: BookingPaymentMethods;
     reservation_status: ReservationStatuses;
@@ -30,7 +30,9 @@ export interface BookingResponse extends BaseResponse {
 export interface BookingWithBoat extends Booking{
     boat: Boat;
 }
-
+export interface BookingViewResponse extends BaseResponse{
+    data: BookingWithBoat;
+}
 
 export interface BookingsListResponse extends BaseResponse{
     data: BookingWithBoat[];
