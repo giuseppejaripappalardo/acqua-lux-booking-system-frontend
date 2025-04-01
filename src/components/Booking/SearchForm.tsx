@@ -90,7 +90,6 @@ const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvai
 
     useEffect(() => {
         if (flowState.isEditMode && !editModeFirstAttempt) {
-            console.log("la prima volta skippo")
             setEditModeFirstAttempt(true);
             /* bypassiamo il controllo. Il motivo dello skip è che se per qualche motivo
                  La data di inizio è precedente, partirebbe la chiamata con relativo modal
