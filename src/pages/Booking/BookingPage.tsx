@@ -7,11 +7,11 @@ import BoatService from "../../services/Boat/BoatService.ts";
 import Spinner from "../../components/Layout/Spinner.tsx";
 import {BookingSearchFields} from "../../models/object/Bookings.ts";
 import {DateTime} from "luxon";
-import {stateStdDatetimeFormat, timezone} from "../../utils/DatetimeUtil.ts";
+import {stateStdDatetimeFormat, tzEuropeRome} from "../../utils/DatetimeUtil.ts";
 
 const BookingPage: React.FC = () => {
-    const now = DateTime.now().setZone(timezone);
-    const today = now.plus({hour: 1, minute: 30}).toFormat(stateStdDatetimeFormat);
+    const now = DateTime.now().setZone(tzEuropeRome);
+    const today = now.plus({hour: 2}).toFormat(stateStdDatetimeFormat);
 
     const [boats, setBoats] = React.useState<BoatResponse>();
     const [isLoading, setIsLoading] = React.useState<boolean>(false);

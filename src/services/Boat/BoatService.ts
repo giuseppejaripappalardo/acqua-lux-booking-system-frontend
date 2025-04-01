@@ -4,6 +4,7 @@ import {BoatResponse} from "../../models/response/BoatResponse.ts";
 import {MessagesEnum} from "../../utils/MessagesEnum.ts";
 import {AxiosError} from "axios";
 import {ErrorResponse} from "../../models/response/ErrorResponse.ts";
+import {parseLocalToUtc} from "../../utils/DatetimeUtil.ts";
 
 class BoatService {
 
@@ -21,6 +22,16 @@ class BoatService {
 
     static async searchAvailableBoats(request: SearchAvailableBoatsRequest): Promise<BoatResponse> {
         try {
+
+            // convertiamo le date assumendo che da Europe/Rome (formato inserito dall'utente ) vengano parsate in UTC.
+            console.log("Pre UTC")
+            console.log(request.start_date)
+            console.log(request.end_date)
+            request.start_date = parseLocalToUtc(request.start_date)
+            request.end_date = parseLocalToUtc(request.end_date)
+            console.log("Post UTC")
+            console.log(request.start_date)
+            console.log(request.end_date)
             return await apiPost<BoatResponse, SearchAvailableBoatsRequest>(BoatService.getAvailableBoats, request)
         } catch (ex) {
             const error = ex as AxiosError;

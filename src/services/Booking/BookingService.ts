@@ -4,6 +4,7 @@ import {AxiosError} from "axios";
 import {BookingRequest, EditBookingRequest, ViewBooking} from "../../models/request/BookingRequest.ts";
 import {BookingsListResponse, BookingViewResponse} from "../../models/response/BookingResponse.ts";
 import {ErrorResponse} from "../../models/response/ErrorResponse.ts";
+import {parseLocalToUtc} from "../../utils/DatetimeUtil.ts";
 
 class BookingService {
 
@@ -14,6 +15,15 @@ class BookingService {
 
     static async addBooking(bookingData: BookingRequest): Promise<BookingViewResponse> {
         try {
+            // convertiamo le date assumendo che da Europe/Rome (formato inserito dall'utente ) vengano parsate in UTC.
+            console.log("Pre UTC")
+            console.log(bookingData.start_date)
+            console.log(bookingData.end_date)
+            bookingData.start_date = parseLocalToUtc(bookingData.start_date)
+            bookingData.end_date = parseLocalToUtc(bookingData.end_date)
+            console.log("Post UTC")
+            console.log(bookingData.start_date)
+            console.log(bookingData.end_date)
             return await apiPost<BookingViewResponse, BookingRequest>(BookingService.addBookingAction, bookingData)
         } catch (ex) {
             const error = ex as AxiosError;
@@ -24,6 +34,19 @@ class BookingService {
 
     static async editBooking(bookingData: EditBookingRequest): Promise<BookingViewResponse> {
         try {
+            // convertiamo le date assumendo che da Europe/Rome (formato inserito dall'utente ) vengano parsate in UTC.
+            // convertiamo le date assumendo che da Europe/Rome (formato inserito dall'utente ) vengano parsate in UTC.
+            console.log("Pre UTC")
+            console.log(bookingData.start_date)
+            console.log(bookingData.end_date)
+            bookingData.start_date = parseLocalToUtc(bookingData.start_date)
+            bookingData.end_date = parseLocalToUtc(bookingData.end_date)
+            console.log("Post UTC")
+            console.log(bookingData.start_date)
+            console.log(bookingData.end_date)
+            console.log(bookingData.start_date)
+            console.log(bookingData.end_date)
+
             return await apiPost<BookingViewResponse, EditBookingRequest>(BookingService.editBookingAction, bookingData)
         } catch (ex) {
             const error = ex as AxiosError;

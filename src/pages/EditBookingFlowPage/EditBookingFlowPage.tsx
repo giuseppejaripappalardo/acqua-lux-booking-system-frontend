@@ -12,6 +12,7 @@ import {useParams} from "react-router-dom";
 import BookingService from "../../services/Booking/BookingService.ts";
 import {ViewBooking} from "../../models/request/BookingRequest.ts";
 import Spinner from "../../components/Layout/Spinner.tsx";
+import {parseUtcToLocal} from "../../utils/DatetimeUtil.ts";
 
 
 /**
@@ -82,8 +83,11 @@ const BookingFlowPage: React.FC = () => {
                 setBookingFlowState(prevState => ({
                     ...prevState,
                     originalBooking: booking.data,
-                    startDate: booking.data.start_date,
-                    endDate: booking.data.end_date,
+                    // Qui mi assicuro che le date UTC che arrivano dal backend
+                    // Vengano convertite nel timezone Europe/Rome per una questione
+                    // di consistenza visiva.
+                    startDate: parseUtcToLocal(booking.data.start_date),
+                    endDate: parseUtcToLocal(booking.data.end_date),
                     notes: booking.data.notes,
                     paymentMethod: booking.data.payment_method,
                     seats: booking.data.seat

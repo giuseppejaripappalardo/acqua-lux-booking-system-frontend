@@ -3,7 +3,7 @@ import {useCallback, useEffect, useState} from "react";
 import {DateTime, DateTimeMaybeValid} from "luxon";
 import {useLocation, useNavigate} from "react-router-dom";
 import {BookingSearchFields} from "../../models/object/Bookings.ts";
-import {stateStdDatetimeFormat, timezone} from "../../utils/DatetimeUtil.ts";
+import {stateStdDatetimeFormat, tzEuropeRome} from "../../utils/DatetimeUtil.ts";
 
 interface SearchFormProps {
     flowState: BookingSearchFields;
@@ -19,12 +19,15 @@ const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvai
     const navigate = useNavigate();
     const location = useLocation();
 
-    // da backend il controllo deve avere almeno un buffer di 1 ora dall'ora corrente.
-    // Per evitare errori di validazione settando 1 ora, settiamo 1h e 5 come buffer minimo.
-    const today = DateTime.now().setZone(timezone).plus({hour: 1}).toFormat(stateStdDatetimeFormat);
+    /**
+     * Di base metto un value iniziale con due ore di buffer.
+     * Lato backend il buffer è 1 ora, ma per stare safe mettiamo due.
+     * Poi in ogni caso l'utente può anticiparlo ad 1 ora, ma mai prima perché non passerebbe la validazione.
+     */
+    const today = DateTime.now().setZone(tzEuropeRome).plus({hour: 1}).toFormat(stateStdDatetimeFormat);
 
     const handleDatetimeValidation = useCallback((start: DateTimeMaybeValid, end: DateTimeMaybeValid) => {
-        const now = DateTime.now().setZone(timezone);
+        const now = DateTime.now().setZone(tzEuropeRome);
 
         if (flowState.startDate === "" || flowState.endDate === "") {
             setDisableSearch(true);
@@ -57,8 +60,8 @@ const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvai
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
-        const start = DateTime.fromISO(flowState.startDate, {zone: timezone});
-        const end = DateTime.fromISO(flowState.endDate, {zone: timezone});
+        const start = DateTime.fromISO(flowState.startDate, {zone: tzEuropeRome});
+        const end = DateTime.fromISO(flowState.endDate, {zone: tzEuropeRome});
         handleDatetimeValidation(start, end);
 
         const locationMatch = location.pathname.toLowerCase() === "/search-availability";
@@ -93,12 +96,12 @@ const SearchForm: React.FC<SearchFormProps> = ({flowState, setFlowState, getAvai
                  La data di inizio è precedente, partirebbe la chiamata con relativo modal
                 di errore, in quanto la ricerca non si può fare a posteriori.
                  Skippo solo per correttezza visuale, anche se poi di base la modifica
-                 della prenotazione prevede opportuni controlli di validazione.
+                 della prenotazione prevede opportuni controlli di validazione lato backend.
              */
             return
         }
-        const start = DateTime.fromISO(flowState.startDate, {zone: timezone});
-        const end = DateTime.fromISO(flowState.endDate, {zone: timezone});
+        const start = DateTime.fromISO(flowState.startDate, {zone: tzEuropeRome});
+        const end = DateTime.fromISO(flowState.endDate, {zone: tzEuropeRome});
         handleDatetimeValidation(start, end);
     }, [flowState.startDate, flowState.endDate, handleDatetimeValidation, flowState.isEditMode]);
 
