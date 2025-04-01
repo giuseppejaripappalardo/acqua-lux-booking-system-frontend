@@ -27,6 +27,10 @@ const BookingFlowPaymentStep: React.FC<BookingFlowPaymentStepProps> = ({setFlowS
             payment_method: flowState.paymentMethod,
             boat_id: flowState.selectedBoat!.id
         }
+
+        console.log("date")
+        console.log(flowState.startDate)
+        console.log(flowState.endDate)
         return await BookingService.editBooking(bookingRequest)
     }
 
@@ -47,6 +51,9 @@ const BookingFlowPaymentStep: React.FC<BookingFlowPaymentStepProps> = ({setFlowS
             payment_method: flowState.paymentMethod,
             boat_id: flowState.selectedBoat!.id
         }
+        console.log("date")
+        console.log(flowState.startDate)
+        console.log(flowState.endDate)
         return await BookingService.addBooking(bookingRequest)
     }
 
