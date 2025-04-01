@@ -52,16 +52,42 @@ L'applicazione consente agli utenti che hanno effettuato l'accesso di consultare
 
 ## 🧪 Modalità di Sviluppo
 
-Per avviare il progetto in modalità di sviluppo:
+## Avvio del progetto in modalità sviluppo
 
-```bash
+Per avviare il progetto in **modalità sviluppo**, è fondamentale configurare correttamente le variabili d'ambiente e il proxy verso il backend.
+
+### Proxy Vite e gestione CORS
+
+In ambiente di sviluppo, le chiamate verso il backend vengono gestite tramite **proxy**, configurato in `vite.config.ts`, per evitare problemi di **CORS**, specialmente quando il frontend comunica con un backend in **staging** o produzione.
+Nel mio caso specifico, ho gestito il tutto tramite il proxy vite, lavorando in locale sul frontend, avendo l'esigenza di poter puntare su giuseppejaripappalardo.dev.
+
+In questo caso, l'url di base usato dal client HTTP viene impostata a una **stringa vuota (`""`)**, per far si che l'url sia relativo e punti in locahost/127.0.0.1, così che Vite possa intercettare correttamente le richieste ed effettuare il proxy verso l'host backend configurato.
+
+> ℹ️ Il valore definito in `VITE_API_BASE_URL` viene utilizzato **solo** quando il progetto non è in esecuzione in modalità sviluppo.
+
+### File `.env` richiesto
+
+Occorre creare un file `.env` nella root del progetto frontend con le seguenti variabili, per l'ambiente locale:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1
+VITE_DEV_ENV=DEV
+```
+
+A questo punto è possibile eseguire i comandi
+``` bash
 npm install
+```
+
+Ed infine 
+
+``` bash
 npm run dev
 ```
 
 L'applicazione sarà accessibile all'indirizzo `http://localhost:5173`.
 
-## 🌐 Collegamento con il Backend
+## Collegamento con il Backend
 È fondamentale che il backend sia stato avviato e che risulti chiaramente accessibile all’indirizzo previsto (Se avviato in locale) (`http://127.0.0.1:8000/api/v1`).
 
 ## 👨‍💻 Sviluppato da
