@@ -6,7 +6,7 @@ import {BookingFlowSteps, BookingPaymentMethods} from "../../models/object/Booki
 import {BOOKING_PAYMENT_METHODS, BOOKING_STEPS} from "../../utils/Constants.ts";
 import BookingFlowPaymentStep from "../../components/Booking/BookingFlowPaymentStep.tsx";
 import BookingOverview from "../../components/Booking/BookingOverview.tsx";
-import ErrorModal from "../../components/Modal/ErrorModal.tsx";
+import AppModal from "../../components/Modal/AppModal.tsx";
 import {BookingWithBoat} from "../../models/response/BookingResponse.ts";
 import BookingFlowConfirmation from "../../components/Booking/BookingFlowConfirmation.tsx";
 
@@ -103,7 +103,7 @@ const BookingFlowPage: React.FC = () => {
                 <BookingFlowConfirmation flowState={bookingFlowState}/>
             }
 
-            <ErrorModal
+            <AppModal
                 open={bookingFlowState.showErrorModal}
                 onClose={() => setBookingFlowState(prevState => ({
                     ...prevState,

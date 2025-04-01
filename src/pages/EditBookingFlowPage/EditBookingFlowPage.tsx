@@ -4,7 +4,7 @@ import BookingFlowSearchStep from "../../components/Booking/BookingFlowSearchSte
 import {BOOKING_PAYMENT_METHODS, BOOKING_STEPS} from "../../utils/Constants.ts";
 import BookingFlowPaymentStep from "../../components/Booking/BookingFlowPaymentStep.tsx";
 import BookingOverview from "../../components/Booking/BookingOverview.tsx";
-import ErrorModal from "../../components/Modal/ErrorModal.tsx";
+import AppModal from "../../components/Modal/AppModal.tsx";
 import BookingFlowConfirmation from "../../components/Booking/BookingFlowConfirmation.tsx";
 import {BookingFlowState} from "../BookingFlowPage/BookingFlowPage.tsx";
 import RemindOriginalBooking from "../../components/Booking/RemindOriginalBooking.tsx";
@@ -142,7 +142,7 @@ const BookingFlowPage: React.FC = () => {
                 <BookingFlowConfirmation flowState={bookingFlowState}/>
             }
 
-            <ErrorModal
+            <AppModal
                 open={bookingFlowState.showErrorModal}
                 primaryButton={bookingFlowState.modalPrimaryButton ?? null}
                 hideCloseButton={bookingFlowState.modalHideCloseButton ?? false}
