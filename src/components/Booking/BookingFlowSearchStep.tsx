@@ -6,10 +6,7 @@ import {BoatResponse} from "../../models/response/BoatResponse.ts";
 import {useLocation} from "react-router-dom";
 import {BookingFlowState} from "../../pages/BookingFlowPage/BookingFlowPage.tsx";
 import {BookingSearchFields} from "../../models/object/Bookings.ts";
-import {
-    EditSearchAvailableBoatsRequest,
-    SearchAvailableBoatsRequest
-} from "../../models/request/SearchAvailableBoatsRequest.ts";
+import {EditSearchAvailableBoatsRequest} from "../../models/request/SearchAvailableBoatsRequest.ts";
 import BoatService from "../../services/Boat/BoatService.ts";
 
 interface BookingFlowSearchStepProps {
