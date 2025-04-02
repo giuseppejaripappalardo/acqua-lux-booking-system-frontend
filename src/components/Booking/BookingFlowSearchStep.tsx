@@ -6,7 +6,10 @@ import {BoatResponse} from "../../models/response/BoatResponse.ts";
 import {useLocation} from "react-router-dom";
 import {BookingFlowState} from "../../pages/BookingFlowPage/BookingFlowPage.tsx";
 import {BookingSearchFields} from "../../models/object/Bookings.ts";
-import {SearchAvailableBoatsRequest} from "../../models/request/SearchAvailableBoatsRequest.ts";
+import {
+    EditSearchAvailableBoatsRequest,
+    SearchAvailableBoatsRequest
+} from "../../models/request/SearchAvailableBoatsRequest.ts";
 import BoatService from "../../services/Boat/BoatService.ts";
 
 interface BookingFlowSearchStepProps {
@@ -31,13 +34,15 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
 
     const handleSearch = useCallback(() => {
         if (flowState.startDate === "" || flowState.endDate === "" || isNaN(flowState.seats)) return;
+        if (!flowState?.originalBooking?.id) return;
         setIsLoading(true);
-        const SearchRequest: SearchAvailableBoatsRequest = {
+        const SearchRequest: EditSearchAvailableBoatsRequest = {
             start_date: flowState.startDate,
             end_date: flowState.endDate,
             seat: flowState.seats,
+            booking_id: flowState.originalBooking.id,
         }
-        BoatService.searchAvailableBoats(SearchRequest).then((boats) => {
+        BoatService.editSearchAvailableBoats(SearchRequest).then((boats) => {
             setBoats(boats);
             setIsLoading(false);
             if (boats && boats.data.length === 0) {
