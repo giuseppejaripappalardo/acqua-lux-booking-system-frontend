@@ -3,28 +3,30 @@ import {X} from 'lucide-react';
 import * as React from "react";
 import {useNavigate} from "react-router-dom";
 
-interface ErrorModalProps {
+export interface AppModalProps {
     open: boolean;
     onClose: () => void;
     title?: string;
     message: string;
+    secondaryButtonLabel?: string;
     hideCloseButton?: boolean;
     primaryButton?: {
         label: string;
-        link: string;
+        link?: string;
+        action?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
     } | null
 }
 
-const ErrorModal: React.FC<ErrorModalProps> = ({
-                                                   open,
-                                                   onClose,
-                                                   title = "Errore",
-                                                   message,
-                                                   hideCloseButton = false,
-                                                   primaryButton = null
-                                               }) => {
+const AppModal: React.FC<AppModalProps> = ({
+                                               open,
+                                               onClose,
+                                               title = "Errore",
+                                               message,
+                                               secondaryButtonLabel,
+                                               hideCloseButton = false,
+                                               primaryButton = null,
+                                           }) => {
     const navigate = useNavigate();
-
 
     return (
         <Dialog.Root open={open} onOpenChange={onClose}>
@@ -45,22 +47,38 @@ const ErrorModal: React.FC<ErrorModalProps> = ({
 
                     {(primaryButton || !hideCloseButton) && (
                         <div className="mt-6 flex justify-end gap-2">
-                            {primaryButton && (
+                            {primaryButton && primaryButton.link && primaryButton.link.trim() !== "" && (
                                 <Dialog.Close asChild>
+                                    {
+                                        primaryButton.link && primaryButton.link.trim() !== "" &&
+                                        <button
+                                            onClick={() => navigate(primaryButton.link as string)}
+                                            className="px-4 py-2 bg-[#D4AF37] hover:bg-yellow-600 text-white rounded-md font-medium transition cursor-pointe"
+                                        >
+                                            {primaryButton.label}
+                                        </button>
+                                    }
+                                </Dialog.Close>
+                            )}
+
+                            {primaryButton && primaryButton.action != undefined && (
+                                <Dialog.Close asChild>
+
                                     <button
-                                        onClick={() => navigate(primaryButton.link)}
-                                        className="px-4 py-2 bg-[#D4AF37] hover:bg-yellow-600 text-white rounded-md font-medium transition"
+                                        onClick={(e) => primaryButton.action && primaryButton.action(e)}
+                                        className="px-4 py-2 bg-[#D4AF37] hover:bg-yellow-600 text-white rounded-md font-medium transition cursor-pointer"
                                     >
                                         {primaryButton.label}
                                     </button>
                                 </Dialog.Close>
                             )}
+
                             {
                                 !hideCloseButton && (
                                     <Dialog.Close asChild>
                                         <button
-                                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
-                                            Chiudi
+                                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition cursor-pointer">
+                                            {secondaryButtonLabel ? secondaryButtonLabel : 'Chiudi'}
                                         </button>
                                     </Dialog.Close>
                                 )
@@ -73,4 +91,4 @@ const ErrorModal: React.FC<ErrorModalProps> = ({
     );
 };
 
-export default ErrorModal;
+export default AppModal;

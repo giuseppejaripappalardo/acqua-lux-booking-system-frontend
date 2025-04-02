@@ -9,10 +9,12 @@ export interface BookingRequest {
     payment_method: BookingPaymentMethods
 }
 
-
-export interface ViewBooking {
-    booking_id: number
+interface BookingViewDeleteRequest {
+    booking_id: number;
 }
+
+export type ViewBooking = BookingViewDeleteRequest;
+export type DeleteBookingRequest = BookingViewDeleteRequest;
 
 export interface EditBookingRequest extends BookingRequest{
     booking_id: number;

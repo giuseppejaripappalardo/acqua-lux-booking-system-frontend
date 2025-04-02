@@ -5,14 +5,25 @@ import * as React from "react";
 import {BookingWithBoat} from "../../models/response/BookingResponse.ts";
 import {useNavigate} from "react-router-dom";
 import {formatCurrency} from "../../utils/CurrencyUtil.ts";
+import {AppModalProps} from "../Modal/AppModal.tsx";
+import BookingService from "../../services/Booking/BookingService.ts";
+import {DeleteBookingRequest} from "../../models/request/BookingRequest.ts";
 
 interface BookingCardProps {
     booking: BookingWithBoat;
     showActions?: boolean;
     showIsEditMode?: boolean;
+    setModal?: React.Dispatch<React.SetStateAction<AppModalProps>> | null;
+    setRefreshList?: React.Dispatch<React.SetStateAction<boolean>> | null;
 }
 
-const BookingCard: React.FC<BookingCardProps> = ({booking, showActions = true, showIsEditMode = false}) => {
+const BookingCard: React.FC<BookingCardProps> = ({
+                                                     booking,
+                                                     showActions = true,
+                                                     showIsEditMode = false,
+                                                     setModal = null,
+                                                     setRefreshList = null,
+                                                 }) => {
     const navigate = useNavigate();
     const renderStatusBadge = (status: string) => {
         const base = "text-sm font-semibold px-2 py-1 rounded-md";
@@ -53,6 +64,53 @@ const BookingCard: React.FC<BookingCardProps> = ({booking, showActions = true, s
             );
         }
     };
+
+    const handleDelete = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (!setModal) return;
+        if (!setRefreshList) return;
+        const bookingDeleteRequest: DeleteBookingRequest = {
+            booking_id: booking.id
+        }
+        BookingService.deleteBooking(bookingDeleteRequest).then(res => {
+            if (res.success) {
+                setModal(prevState => ({
+                    ...prevState,
+                    open: false,
+                    primaryButton: null,
+                }));
+                setRefreshList(true);
+            }
+        }).catch((err) => {
+            setModal(prevState => ({
+                        ...prevState,
+                        open: true,
+                        title: "Si è verificato un errore",
+                        message: err.message,
+                        primaryButton: null
+                    }
+                )
+            );
+        });
+    }
+
+    const handleModal = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (!setModal) return;
+
+        setModal(prevState => ({
+                ...prevState,
+                title: "Conferma cancellazione",
+                message: "Sei sicuro di voler cancellare questa prenotazione?",
+                secondaryButtonLabel: "Annulla",
+                open: true,
+                primaryButton: {
+                    label: "Conferma operazione",
+                    action: handleDelete,
+                }
+            })
+        );
+    }
 
     return (
         <div
@@ -101,7 +159,7 @@ const BookingCard: React.FC<BookingCardProps> = ({booking, showActions = true, s
                     <p><span className="font-semibold text-[#0A1F44]">Metodo di pagamento:</span>{" "}
                         {BOOKING_METHODS_TRANSLATIONS[booking.payment_method]}
                     </p>
-                    <p> <span className="font-semibold text-[#0A1F44]">Totale:</span>{" "}
+                    <p><span className="font-semibold text-[#0A1F44]">Totale:</span>{" "}
                         {formatCurrency(booking.total_price)}
                     </p>
                 </div>
@@ -125,7 +183,9 @@ const BookingCard: React.FC<BookingCardProps> = ({booking, showActions = true, s
                         Modifica
                     </button>
                     <button
-                        className="flex items-center gap-2 text-red-600 hover:text-red-800 font-medium transition cursor-pointer">
+                        className="flex items-center gap-2 text-red-600 hover:text-red-800 font-medium transition cursor-pointer"
+                        onClick={handleModal}
+                    >
                         <Trash size={16}/>
                         Cancella
                     </button>

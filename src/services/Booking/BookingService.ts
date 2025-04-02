@@ -1,7 +1,12 @@
 import {apiGet, apiPost, baseUrl} from "../../client/BaseClient.ts";
 import {MessagesEnum} from "../../utils/MessagesEnum.ts";
 import {AxiosError} from "axios";
-import {BookingRequest, EditBookingRequest, ViewBooking} from "../../models/request/BookingRequest.ts";
+import {
+    BookingRequest,
+    DeleteBookingRequest,
+    EditBookingRequest,
+    ViewBooking
+} from "../../models/request/BookingRequest.ts";
 import {BookingsListResponse, BookingViewResponse} from "../../models/response/BookingResponse.ts";
 import {ErrorResponse} from "../../models/response/ErrorResponse.ts";
 import {parseLocalToUtc} from "../../utils/DatetimeUtil.ts";
@@ -12,6 +17,7 @@ class BookingService {
     static editBookingAction = `${baseUrl}/bookings/edit`;
     static getReservationList = `${baseUrl}/bookings/list`;
     static getReservationView = `${baseUrl}/bookings/view`;
+    static deleteReservation = `${baseUrl}/bookings/delete`;
 
     static async addBooking(bookingData: BookingRequest): Promise<BookingViewResponse> {
         try {
@@ -75,6 +81,15 @@ class BookingService {
         }
     }
 
+    static async deleteBooking(bookingRequest: DeleteBookingRequest): Promise<BookingViewResponse> {
+        try {
+            return await apiPost<BookingViewResponse, DeleteBookingRequest>(BookingService.deleteReservation, bookingRequest)
+        } catch (ex) {
+            const error = ex as AxiosError;
+            const errorData = error?.response?.data as ErrorResponse;
+            throw new Error(errorData?.message || MessagesEnum.GENERIC_ERROR);
+        }
+    }
 }
 
 export default BookingService;

@@ -86,11 +86,8 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
     useEffect(() => {
         if (flowState.startDate === "") return;
         if (flowState.endDate === "") return;
-        console.log("Mi fermo qua")
         if (flowState.isEditMode) return;
-        console.log("sono oltre l'edit mode.")
         if (!flowState.firstRunCompleted) {
-            console.log("ci sto entrando come è corretto che sia!")
             handleSearch();
 
             setFlowState(prevState => ({
@@ -106,8 +103,6 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
      */
     useEffect(() => {
         if (flowState.changeBoat) {
-            console.log(
-                "flowState.changeBoat", flowState.changeBoat)
             handleSearch();
         }
     }, [flowState.changeBoat, handleSearch]);
