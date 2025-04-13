@@ -18,16 +18,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({render}) => {
 
     useEffect(() => {
         /**
-         * Se su jotai risulto autenticato, skippiamo il controllo.
-         * Utile comunque che venga fatto il check ad ogni cambio di route
-         * Se per X motivo l'auth viene settata a false perchè fallisce una
-         * chiamata questo blocco garantisce il redirect.
+         * Qui facciamo il controllo sul token al primo mount.
+         * Questo si verifica quando facciamo un refresh della pagina.
+         * Da notare che se il token scade, anche se questo controllo non
+         * viene eseguito, abbiamo l'interceptor che è in ascolto ed in caso
+         * l'utente finirebbe in /login per errore 401.
          */
-        if (!isAuthenticated) {
-            console.log("facciamo il check");
-            handleAuthCheck();
-        }
-    }, [location.pathname]);
+        handleAuthCheck();
+    }, []);
 
     /**
      * Se la verifica è in corso lanciamo lo spinner
@@ -43,7 +41,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({render}) => {
      * 2) Non sto visualizzando una route pubblica?
      * Se entrambe le condizioni sono vere allora l'utente deve essere rimandato alla LOGIN
      */
-    if (!isAuthenticated && !isPublicRoute) {
+    if (!isLoading && !isAuthenticated && !isPublicRoute) {
         return <Navigate to={LOGIN_ROUTE} replace state={{from: location}}/>;
     }
 

@@ -7,7 +7,7 @@ import {footerText} from "../../utils/MessagesEnum.ts";
 const LoginPage: React.FC = () => {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
-    const {login, isLoading, submitDisabled, errorMessage, setSubmitDisabled} = useAuth();
+    const {login, loginSubmitted, submitDisabled, errorMessage, setSubmitDisabled} = useAuth();
 
 
     /**
@@ -98,7 +98,7 @@ const LoginPage: React.FC = () => {
                                 disabled={submitDisabled}
                             >
                                 {
-                                    isLoading ? "Accesso in corso..." : "Accedi"
+                                    loginSubmitted ? "Accesso in corso..." : "Accedi"
                                 }
                             </button>
                         </div>

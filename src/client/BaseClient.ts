@@ -69,7 +69,6 @@ apiClient.interceptors.request.use(
 
                 config.headers.Authorization = `Bearer ${jwt}`;
             } catch (ex: unknown) {
-                console.log("errore nel recupero del token. è scaduto o non valido o l'utente non è autenticato.", ex);
                 jotaiStore.set(authAtom, {
                     isAuthenticated: false,
                     user: null,
@@ -96,6 +95,17 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     response => response,
     error => {
+
+        if(error.response?.status === 401) {
+            // Se siamo qui vuol dire che il token non è più valido o è scaduto.
+            const jotaiStore = getDefaultStore()
+            jotaiStore.set(authAtom, {
+                isAuthenticated: false,
+                user: null,
+                jwt: null
+            });
+        }
+
         console.error('API request failed:', error);
         return Promise.reject(error);
     }

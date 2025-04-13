@@ -31,7 +31,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/Login",
-        element: <ProtectedRoute render={() => <LoginPage/>}/>
+        element: <LoginPage/>
     }
 ]);
 

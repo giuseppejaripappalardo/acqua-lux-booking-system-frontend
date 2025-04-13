@@ -6,6 +6,7 @@ import AuthService from "../services/Auth/AuthService.ts";
 import {LoginResponse} from "../models/response/AuthResponse.ts";
 import {LoginRequest} from "../models/request/AuthRequest.ts";
 import {MessagesEnum} from "../utils/MessagesEnum.ts";
+import {useNavigate} from "react-router-dom";
 
 interface useAuthResult {
     login: (data: LoginRequest) => void;
@@ -16,6 +17,7 @@ interface useAuthResult {
     isLoading: boolean;
     errorMessage: string;
     submitDisabled: boolean;
+    loginSubmitted: boolean;
     setSubmitDisabled: (value: boolean) => void;
     getLoggedUser: () => User | null;
 }
@@ -23,8 +25,10 @@ interface useAuthResult {
 const useAuth = (): useAuthResult => {
     const [auth, setAuth] = useAtom<AuthState>(authAtom)
     const [errorMessage, setErrorMessage] = useState<string>("");
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [loginSubmitted, setLoginSubmitted] = useState<boolean>(false);
     const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
+    const navigate = useNavigate();
 
 
     const getLoggedUser = (): User | null => {
@@ -40,6 +44,7 @@ const useAuth = (): useAuthResult => {
         setIsLoading(true);
         setErrorMessage("");
         setSubmitDisabled(true);
+        setLoginSubmitted(true)
 
         try {
             // Provo a chiamare il metodo di login
@@ -50,6 +55,10 @@ const useAuth = (): useAuthResult => {
                 jwt: response.data.jwt_token,
                 user: response.data.user
             });
+
+            // Se va a buon fine andiamo alla dashboard.
+            navigate("/");
+
         } catch (ex: unknown) {
             // se invece qualcosa va storto settiamo lo state per fornire un feedback visito dell'errore all'utente.
             if (ex instanceof Error) {
@@ -58,10 +67,9 @@ const useAuth = (): useAuthResult => {
                 setErrorMessage(MessagesEnum.GENERIC_ERROR)
             }
         } finally {
+            setLoginSubmitted(false)
             setSubmitDisabled(false);
-            setTimeout(() => {
-                setIsLoading(false);
-            }, 300)
+            setIsLoading(false);
         }
     }
 
@@ -80,9 +88,7 @@ const useAuth = (): useAuthResult => {
                 setErrorMessage(MessagesEnum.GENERIC_ERROR)
             }
         } finally {
-            setTimeout(() => {
-                setIsLoading(false);
-            }, 300)
+            setIsLoading(false);
             setSubmitDisabled(false);
         }
         setAuth({
@@ -101,6 +107,7 @@ const useAuth = (): useAuthResult => {
          * l'utente alla login, oppure consentire la visualizzazione.
          */
         setIsLoading(true);
+        console.log("chiamo handle auth")
         try {
             const result = await AuthService.getToken();
             if (result.data) {
@@ -141,6 +148,7 @@ const useAuth = (): useAuthResult => {
         hasRole,
         isLoading,
         submitDisabled,
+        loginSubmitted,
         setSubmitDisabled,
         errorMessage,
         getLoggedUser
