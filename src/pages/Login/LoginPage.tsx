@@ -2,14 +2,12 @@ import * as React from "react";
 import {useEffect} from "react";
 import {LoginRequest} from "../../models/request/AuthRequest.ts";
 import useAuth from "../../hooks/useAuth.ts";
-import {useNavigate} from "react-router-dom";
 import {footerText} from "../../utils/MessagesEnum.ts";
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
-    const {isAuthenticated, login, isLoading, submitDisabled, errorMessage, setSubmitDisabled} = useAuth();
-    const navigate = useNavigate();
+    const {login, isLoading, submitDisabled, errorMessage, setSubmitDisabled} = useAuth();
 
 
     /**
@@ -34,22 +32,6 @@ const LoginPage: React.FC = () => {
             setSubmitDisabled(false);
         }
     }, [username, password, setSubmitDisabled, submitDisabled]);
-
-    /**
-     *  Ho inserito questo use effect per controllare se l'utente
-     *  è già autenticato. Se lo è allora non deve atterrare qui e dobbiamo
-     *  rimandarlo in homepage
-     */
-    useEffect(() => {
-
-        console.log(
-            "isAuthenticated: ",
-            isAuthenticated)
-
-        if (isAuthenticated) {
-            navigate("/")
-        }
-    }, [isAuthenticated, navigate]);
 
     return (
         <div

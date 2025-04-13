@@ -1,72 +1,39 @@
 import * as React from "react";
-import {JSX, useEffect, useState} from "react";
+import {JSX, useEffect} from "react";
 import {Navigate, useLocation} from "react-router-dom";
 import Spinner from "../Layout/Spinner.tsx";
-import AuthService from "../../services/Auth/AuthService.ts";
-import {useAtom} from "jotai";
-import {authAtom} from "../../store/auth.ts";
+import useAuth from "../../hooks/useAuth.ts";
 
 interface ProtectedRouteProps {
-    children: JSX.Element;
+    render: () => JSX.Element;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
-    const [authState, setAuthState] = useAtom(authAtom);
-    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({render}) => {
+    const {handleAuthCheck, isLoading, isAuthenticated} = useAuth();
     const location = useLocation();
-    const PUBLIC_ROUTES = ["/login"];
+    const LOGIN_ROUTE = "/login";
+    const PUBLIC_ROUTES = [LOGIN_ROUTE];
     // controlliamo se stiamo visitando una route che dovrebbe essere accessibile pubblicamente.
     const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname.toLowerCase());
 
-
     useEffect(() => {
-        let isMounted = true;
-
-        // Se la route è public oppure simao autenticati, skippiamo i controlli.
-        if (isPublicRoute || authState.isAuthenticated) {
-            setIsCheckingAuth(false);
-            return;
-        }
-
         /**
-         * Chiamo getToken che controlla se il cookie ha un jwt valido.
-         * Se lo ha lo settiamo nello state globale su Jotai, cosi da renderlo
-         * accessibile all'intera applicazione. Altrimenti settiamo tutto a false.
-         * I controlli successivi penseranno a fare il resto del lavoro e rimandare
-         * l'utente alla login, oppure consentire la visualizzazione.
+         * Se su jotai risulto autenticato, skippiamo il controllo.
+         * Utile comunque che venga fatto il check ad ogni cambio di route
+         * Se per X motivo l'auth viene settata a false perchè fallisce una
+         * chiamata questo blocco garantisce il redirect.
          */
-        AuthService.getToken()
-            .then((result) => {
-                if (isMounted && result.data) {
-                    setAuthState({
-                        isAuthenticated: true,
-                        jwt: result.data.jwt_token,
-                        user: result.data.user
-                    });
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-                if (isMounted) {
-                    setAuthState({
-                        isAuthenticated: false,
-                        jwt: null,
-                        user: null
-                    });
-                }
-            })
-            .finally(() => {
-                if (isMounted) {
-                    setIsCheckingAuth(false);
-                }
-            });
-
-        return () => {
-            isMounted = false;
-        };
+        if (!isAuthenticated) {
+            console.log("facciamo il check");
+            handleAuthCheck();
+        }
     }, [location.pathname]);
 
-    if (isCheckingAuth) {
+    /**
+     * Se la verifica è in corso lanciamo lo spinner
+     * Per evitare render di componenti o redirect.
+     */
+    if (isLoading) {
         return <Spinner/>;
     }
 
@@ -76,14 +43,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
      * 2) Non sto visualizzando una route pubblica?
      * Se entrambe le condizioni sono vere allora l'utente deve essere rimandato alla LOGIN
      */
-    if (!authState.isAuthenticated && !isPublicRoute) {
-        return <Navigate to="/login" replace state={{from: location}}/>;
+    if (!isAuthenticated && !isPublicRoute) {
+        return <Navigate to={LOGIN_ROUTE} replace state={{from: location}}/>;
     }
 
-    /**
-     * Se tutti i controlli sopra vengono superati
-     * Allora significa che l'utente può vedere le pagine protette.
-     */
-    return children;
+    if (isAuthenticated && location.pathname === LOGIN_ROUTE) {
+        console.log('redirect specifico da login');
+        return <Navigate to="/" replace/>;
+    }
+
+    if (isAuthenticated || isPublicRoute) {
+        return render();
+    }
+
+    return <Spinner/>;
 };
 export default ProtectedRoute;

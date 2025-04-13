@@ -13,36 +13,25 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <ProtectedRoute>
-                    <BookingPage/>
-                </ProtectedRoute>,
+                element: <ProtectedRoute render={() => <BookingPage/>}/>
             },
             {
                 path: "/search-availability",
-                element: <ProtectedRoute>
-                    <BookingFlowPage/>
-                </ProtectedRoute>,
+                element: <ProtectedRoute render={() => <BookingFlowPage/>}/>
             },
             {
                 path: "/edit-booking/:id",
-                element: <ProtectedRoute>
-                    <EditBookingFlowPage/>
-                </ProtectedRoute>,
+                element: <ProtectedRoute render={() => <EditBookingFlowPage/>}/>
             },
             {
                 path: "/my-bookings",
-                element: <ProtectedRoute>
-                    <MyBookingsPage/>
-                </ProtectedRoute>,
+                element: <ProtectedRoute render={() => <MyBookingsPage/>}/>
             }
         ]
     },
     {
         path: "/Login",
-        element:
-            <ProtectedRoute>
-                <LoginPage/>
-            </ProtectedRoute>
+        element: <ProtectedRoute render={() => <LoginPage/>}/>
     }
 ]);
 

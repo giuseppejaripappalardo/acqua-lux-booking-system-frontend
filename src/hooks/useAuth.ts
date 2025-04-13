@@ -10,6 +10,7 @@ import {MessagesEnum} from "../utils/MessagesEnum.ts";
 interface useAuthResult {
     login: (data: LoginRequest) => void;
     logout: () => void;
+    handleAuthCheck: () => void;
     isAuthenticated: boolean;
     hasRole: (role: string) => boolean;
     isLoading: boolean;
@@ -21,7 +22,7 @@ interface useAuthResult {
 
 const useAuth = (): useAuthResult => {
     const [auth, setAuth] = useAtom<AuthState>(authAtom)
-    const [errorMessage, setErrorMessge] = useState<string>("");
+    const [errorMessage, setErrorMessage] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
 
@@ -37,7 +38,7 @@ const useAuth = (): useAuthResult => {
 
         // Resetto gli state interni, che verranno esposti.
         setIsLoading(true);
-        setErrorMessge("");
+        setErrorMessage("");
         setSubmitDisabled(true);
 
         try {
@@ -52,9 +53,9 @@ const useAuth = (): useAuthResult => {
         } catch (ex: unknown) {
             // se invece qualcosa va storto settiamo lo state per fornire un feedback visito dell'errore all'utente.
             if (ex instanceof Error) {
-                setErrorMessge(ex.message || MessagesEnum.GENERIC_ERROR);
+                setErrorMessage(ex.message || MessagesEnum.GENERIC_ERROR);
             } else {
-                setErrorMessge(MessagesEnum.GENERIC_ERROR)
+                setErrorMessage(MessagesEnum.GENERIC_ERROR)
             }
         } finally {
             setSubmitDisabled(false);
@@ -74,9 +75,9 @@ const useAuth = (): useAuthResult => {
             await AuthService.logout()
         } catch (ex: unknown) {
             if (ex instanceof Error) {
-                setErrorMessge(ex.message || MessagesEnum.GENERIC_ERROR);
+                setErrorMessage(ex.message || MessagesEnum.GENERIC_ERROR);
             } else {
-                setErrorMessge(MessagesEnum.GENERIC_ERROR)
+                setErrorMessage(MessagesEnum.GENERIC_ERROR)
             }
         } finally {
             setTimeout(() => {
@@ -91,6 +92,42 @@ const useAuth = (): useAuthResult => {
         });
     }
 
+    const handleAuthCheck = async () => {
+        /**
+         * Chiamo getToken che controlla se il cookie ha un jwt valido.
+         * Se lo ha lo settiamo nello state globale su Jotai, cosi da renderlo
+         * accessibile all'intera applicazione. Altrimenti settiamo tutto a false.
+         * I controlli successivi penseranno a fare il resto del lavoro e rimandare
+         * l'utente alla login, oppure consentire la visualizzazione.
+         */
+        setIsLoading(true);
+        try {
+            const result = await AuthService.getToken();
+            if (result.data) {
+                setAuth({
+                    isAuthenticated: true,
+                    jwt: result.data.jwt_token,
+                    user: result.data.user
+                });
+            } else {
+                setAuth({
+                    isAuthenticated: false,
+                    jwt: null,
+                    user: null
+                });
+            }
+        } catch (err) {
+            console.error("Token retrieval failed:", err);
+            setAuth({
+                isAuthenticated: false,
+                jwt: null,
+                user: null
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const isAuthenticated = auth.isAuthenticated;
     const hasRole = (role: string) => {
         return role === auth.user?.role?.name;
@@ -99,6 +136,7 @@ const useAuth = (): useAuthResult => {
     return {
         login,
         logout,
+        handleAuthCheck,
         isAuthenticated,
         hasRole,
         isLoading,
