@@ -6,7 +6,10 @@ import {BoatResponse} from "../../models/response/BoatResponse.ts";
 import {useLocation} from "react-router-dom";
 import {BookingFlowState} from "../../pages/BookingFlowPage/BookingFlowPage.tsx";
 import {BookingSearchFields} from "../../models/object/Bookings.ts";
-import {SearchAvailableBoatsRequest} from "../../models/request/SearchAvailableBoatsRequest.ts";
+import {
+    EditSearchAvailableBoatsRequest,
+    SearchAvailableBoatsRequest
+} from "../../models/request/SearchAvailableBoatsRequest.ts";
 import BoatService from "../../services/Boat/BoatService.ts";
 
 interface BookingFlowSearchStepProps {
@@ -32,26 +35,56 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
     const handleSearch = useCallback(() => {
         if (flowState.startDate === "" || flowState.endDate === "" || isNaN(flowState.seats)) return;
         setIsLoading(true);
-        const SearchRequest: SearchAvailableBoatsRequest = {
-            start_date: flowState.startDate,
-            end_date: flowState.endDate,
-            seat: flowState.seats,
-        }
-        BoatService.searchAvailableBoats(SearchRequest).then((boats) => {
-            setBoats(boats);
-            setIsLoading(false);
-            if (boats && boats.data.length === 0) {
-                setResultMessage(messages.NOT_FOUND);
+
+        if (!flowState.isEditMode) {
+            const SearchRequest: SearchAvailableBoatsRequest = {
+                start_date: flowState.startDate,
+                end_date: flowState.endDate,
+                seat: flowState.seats,
             }
-        }).catch((err) => {
-            setFlowState(prevState => ({
-                ...prevState,
-                showErrorModal: true,
-                modalErrorMsg: err.message,
-            }));
-        }).finally(() => {
-            setIsLoading(false);
-        })
+            BoatService.searchAvailableBoats(SearchRequest).then((boats) => {
+                setBoats(boats);
+                setIsLoading(false);
+                if (boats && boats.data.length === 0) {
+                    setResultMessage(messages.NOT_FOUND);
+                }
+            }).catch((err) => {
+                setFlowState(prevState => ({
+                    ...prevState,
+                    showErrorModal: true,
+                    modalErrorMsg: err.message,
+                }));
+            }).finally(() => {
+                setIsLoading(false);
+            })
+        } else {
+
+            if (!flowState.originalBooking) return;
+
+            const editSearchRequest: EditSearchAvailableBoatsRequest = {
+                start_date: flowState.startDate,
+                end_date: flowState.endDate,
+                seat: flowState.seats,
+                booking_id: flowState.originalBooking.id,
+            }
+
+            BoatService.editSearchAvailableBoats(editSearchRequest).then((boats) => {
+                setBoats(boats);
+                setIsLoading(false);
+                if (boats && boats.data.length === 0) {
+                    setResultMessage(messages.NOT_FOUND);
+                }
+            }).catch((err) => {
+                setFlowState(prevState => ({
+                    ...prevState,
+                    showErrorModal: true,
+                    modalErrorMsg: err.message,
+                }));
+            }).finally(() => {
+                setIsLoading(false);
+            })
+        }
+
         setFlowState(prevState => ({
             ...prevState,
             searchAttempt: true,
@@ -81,8 +114,11 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
     useEffect(() => {
         if (flowState.startDate === "") return;
         if (flowState.endDate === "") return;
+        console.log("Mi fermo qua")
         if (flowState.isEditMode) return;
+        console.log("sono oltre l'edit mode.")
         if (!flowState.firstRunCompleted) {
+            console.log("ci sto entrando come è corretto che sia!")
             handleSearch();
 
             setFlowState(prevState => ({
@@ -98,6 +134,8 @@ const BookingFlowSearchStep: React.FC<BookingFlowSearchStepProps> = ({setFlowSta
      */
     useEffect(() => {
         if (flowState.changeBoat) {
+            console.log(
+                "flowState.changeBoat", flowState.changeBoat)
             handleSearch();
         }
     }, [flowState.changeBoat, handleSearch]);

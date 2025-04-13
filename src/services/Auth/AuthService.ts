@@ -8,7 +8,7 @@ class AuthService {
 
 
     static loginUrl = `${baseUrl}/auth/login`;
-    static getTokenUrl = `${baseUrl}/auth/get_token`;
+    static getTokenUrl = `${baseUrl}/auth/get-token`;
     static getLogoutUrl = `${baseUrl}/auth/logout`;
 
     static async login(requestData: LoginRequest): Promise<LoginResponse> {
