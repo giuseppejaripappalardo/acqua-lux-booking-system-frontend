@@ -6,7 +6,7 @@ import AuthService from "../services/Auth/AuthService.ts";
 import {LoginResponse} from "../models/response/AuthResponse.ts";
 
 const apiClient: AxiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_DEV_ENV === 'DEV' ? '' : import.meta.env.VITE_API_URL,
+    baseURL: import.meta.env.VITE_DEV_ENV === 'DEV' ? '' : import.meta.env.VITE_API_BASE_URL,
     timeout: 5000,
     withCredentials: true,
 });

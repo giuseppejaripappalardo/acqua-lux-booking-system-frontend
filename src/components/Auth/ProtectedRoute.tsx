@@ -15,9 +15,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const location = useLocation();
     const PUBLIC_ROUTES = ["/login"];
+    // controlliamo se stiamo visitando una route che dovrebbe essere accessibile pubblicamente.
+    const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname.toLowerCase());
+
 
     useEffect(() => {
         let isMounted = true;
+
+        // Se la route è public oppure simao autenticati, skippiamo i controlli.
+        if (isPublicRoute || authState.isAuthenticated) {
+            setIsCheckingAuth(false);
+            return;
+        }
 
         /**
          * Chiamo getToken che controlla se il cookie ha un jwt valido.
@@ -60,9 +69,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
     if (isCheckingAuth) {
         return <Spinner/>;
     }
-
-    // controlliamo se stiamo visitando una route che dovrebbe essere accessibile pubblicamente.
-    const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname.toLowerCase());
 
     /**
      * Di fatto qui il controllo implica questo:
