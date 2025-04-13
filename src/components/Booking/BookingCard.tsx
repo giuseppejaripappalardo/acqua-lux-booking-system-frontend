@@ -165,7 +165,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
                 </div>
 
                 {
-                    !showIsEditMode && booking.created_at !== booking.modified_at &&
+                    !showIsEditMode && booking.created_at !== booking.modified_at && booking.reservation_status === BOOKING_STATUSES.CONFIRMED &&
                     renderEditPriceDifference()
                 }
 
