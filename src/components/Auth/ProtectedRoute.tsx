@@ -3,6 +3,7 @@ import {JSX, useEffect} from "react";
 import {Navigate, useLocation} from "react-router-dom";
 import Spinner from "../Layout/Spinner.tsx";
 import useAuth from "../../hooks/useAuth.ts";
+import {LOGIN_ROUTE} from "../../pages/Login/LoginPage.tsx";
 
 interface ProtectedRouteProps {
     render: () => JSX.Element;
@@ -11,7 +12,6 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({render}) => {
     const {handleAuthCheck, isLoading, isAuthenticated} = useAuth();
     const location = useLocation();
-    const LOGIN_ROUTE = "/login";
     const PUBLIC_ROUTES = [LOGIN_ROUTE];
     // controlliamo se stiamo visitando una route che dovrebbe essere accessibile pubblicamente.
     const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname.toLowerCase());
@@ -25,13 +25,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({render}) => {
          * l'utente finirebbe in /login per errore 401.
          */
         handleAuthCheck();
-    }, []);
+    }, [location.pathname]);
 
     /**
      * Se la verifica è in corso lanciamo lo spinner
      * Per evitare render di componenti o redirect.
      */
-    if (isLoading) {
+    if (isLoading && !isAuthenticated) {
         return <Spinner/>;
     }
 
@@ -50,7 +50,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({render}) => {
         return <Navigate to="/" replace/>;
     }
 
-    if (isAuthenticated || isPublicRoute) {
+    if (isAuthenticated && !isLoading || isPublicRoute && !isLoading) {
         return render();
     }
 

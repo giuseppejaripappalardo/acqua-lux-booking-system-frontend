@@ -4,7 +4,6 @@ import {BoatResponse} from "../../models/response/BoatResponse.ts";
 import BoatCard from "../../components/Card/BoatCard.tsx";
 import SearchForm from "../../components/Booking/SearchForm.tsx";
 import BoatService from "../../services/Boat/BoatService.ts";
-import Spinner from "../../components/Layout/Spinner.tsx";
 import {BookingSearchFields} from "../../models/object/Bookings.ts";
 import {DateTime} from "luxon";
 import {stateStdDatetimeFormat, tzEuropeRome} from "../../utils/DatetimeUtil.ts";
@@ -36,9 +35,9 @@ const BookingPage: React.FC = () => {
         retrieveBoats()
     }, [retrieveBoats]);
 
-    if (isLoading) {
-        return <Spinner/>;
-    }
+    // if (isLoading) {
+    //     return <Spinner/>;
+    // }
 
     return (
         <div>
@@ -77,6 +76,11 @@ const BookingPage: React.FC = () => {
                     <p className="text-center text-xl text-[#0A1F44]">
                         Non ci sono imbarcazioni disponibili.
                     </p>
+                }
+
+                {
+                    isLoading &&
+                    "Caricamento catalogo..."
                 }
             </div>
         </div>

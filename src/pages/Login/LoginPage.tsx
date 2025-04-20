@@ -4,11 +4,12 @@ import {LoginRequest} from "../../models/request/AuthRequest.ts";
 import useAuth from "../../hooks/useAuth.ts";
 import {footerText} from "../../utils/MessagesEnum.ts";
 
+export const LOGIN_ROUTE = "/login";
+
 const LoginPage: React.FC = () => {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
     const {login, loginSubmitted, submitDisabled, errorMessage, setSubmitDisabled} = useAuth();
-
 
     /**
      * Questo metodo viene chiamato al submit del form di login

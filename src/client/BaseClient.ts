@@ -3,7 +3,6 @@ import {authAtom} from "../store/auth.ts";
 import {AuthState} from "../models/object/AuthState.ts";
 import {getDefaultStore} from "jotai";
 import AuthService from "../services/Auth/AuthService.ts";
-import {LoginResponse} from "../models/response/AuthResponse.ts";
 
 const apiClient: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_DEV_ENV === 'DEV' ? '' : import.meta.env.VITE_API_BASE_URL,
@@ -34,48 +33,10 @@ apiClient.interceptors.request.use(
          */
         const jotaiStore = getDefaultStore()
         const auth = jotaiStore.get(authAtom) as AuthState;
-        let jwt = auth.jwt;
+        const jwt = auth.jwt;
 
-        /**
-         * Se nello state manager JOTAI non abbiamo settato lo stato sul JWT
-         * Significa che l'utente ha ricaricato la pagina oppure non è autenticato.
-         */
-        if (!jwt) {
-            try {
-                /**
-                 * In questo caso controlliamo specificatamente se l'utente era autenticato.
-                 * Se lo era, il backend ha settato di sicuro il cookie.
-                 * Il metodo getToken oltre a verificare il cookie, controlla anche se il token è ancora valido.
-                 * Di conseguenza se riceviamo una risposta sappiamo di sicuro che:
-                 * 1) il token non è scaduto
-                 * 2) il token è valido
-                 * 3) il cookie non è scaduto.
-                 * Il cookie è Secure e HttpOnly, quindi non è accessibile lato client per ragioni di security ;)
-                 */
-                const authResponse: LoginResponse = await AuthService.getToken()
 
-                // Se abbiamo ricevuto risposta possiamo confidentemente settare lo state.
-                jotaiStore.set(authAtom, {
-                    isAuthenticated: true,
-                    user: authResponse.data.user,
-                    jwt: authResponse.data.jwt_token
-                });
-                jwt = authResponse.data.jwt_token;
-
-                /**
-                 *  E quindi passare il token jwt negli header per le richieste in cui
-                 *  l'autenticazione è chiaramente obbligatoria.
-                 */
-
-                config.headers.Authorization = `Bearer ${jwt}`;
-            } catch (ex: unknown) {
-                jotaiStore.set(authAtom, {
-                    isAuthenticated: false,
-                    user: null,
-                    jwt: null
-                })
-            }
-        } else {
+        if(jwt) {
             /**
              *  Qui ci finiamo solo se nello state il token è già settato.
              *  Questo si verifica solo nei casi in cui l'utente ha fatto la login
@@ -83,7 +44,6 @@ apiClient.interceptors.request.use(
              *  Il fatto di ricaricare la pagina implica che lo stato venga distrutto e non è più accessibile.
              *  Ho deciso per scelta di non persistere il token in localStorage per prevenire attacchi XSS.
              */
-
             config.headers.Authorization = `Bearer ${jwt}`;
         }
         return config;
