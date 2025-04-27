@@ -32,7 +32,6 @@ export interface BookingFlowState {
     isEditMode: boolean;
     originalBooking: BookingWithBoat | null;
 }
-
 /**
  * Questo componente serve per orchestrare il flusso di ricerca disponibilità.
  * L'orchestrazione prevede un flusso di ricerca che sfurtta il componente dedicato BookingFlowSearchStep.
@@ -48,8 +47,11 @@ export interface BookingFlowState {
  * Lo step finale è uno step di cortesia che mostra un messaggio di conferma.
  */
 const BookingFlowPage: React.FC = () => {
-
-    // Di base iniziamo sempre con lo step Search
+    /**
+     * Inizializzo lo state con valori di default.
+     * Lo step iniziale sarà sempre Search, poiché l'utente avvierà il flusso
+     * di prenotazione a partire dalla verifica delle disponibilità.
+     */
     const [bookingFlowState, setBookingFlowState] = useState<BookingFlowState>({
         step: BOOKING_STEPS.search,
         seats: 1,
@@ -69,7 +71,12 @@ const BookingFlowPage: React.FC = () => {
         isEditMode: false,
         originalBooking: null,
     });
-
+    /**
+     * Come dependencies a questo useEffect setto l'ascolto di bookingFlowState.
+     * Se lo step è === a search e ho selezionato una imbarcazione allora cambiamo lo step
+     * in payment, ovvero l'interfaccia che mostra il riepilogo di prenotazione e le modalità
+     * di pagamento.
+     */
     useEffect(() => {
         if (bookingFlowState.step === BOOKING_STEPS.search &&
             bookingFlowState.selectedBoat !== null) {
@@ -79,13 +86,20 @@ const BookingFlowPage: React.FC = () => {
             });
         }
     }, [bookingFlowState]);
-
     return (
         <div className="w-full mx-auto px-4 pt-8 pb-16">
+
+            {/*
+                Se lo step è search mostriamo BookingFlowStepSearch
+                Componente implementato ad hoc per la pagina di ricerca delle disponibilità.
+            */}
             {bookingFlowState.step === BOOKING_STEPS.search && (
                 <BookingFlowSearchStep setFlowState={setBookingFlowState} flowState={bookingFlowState}/>
             )}
-
+            {/*
+                Se lo step è payment: Mostro la pagina di riepilogo prenotazione associata
+                al componente per la selezione del metodo di pagamento.
+            */}
             {bookingFlowState.step === BOOKING_STEPS.payment && (
                 <div className="mt-6">
                     <div className="w-full bg-white p-6 rounded-xl shadow-xl space-y-6">
@@ -97,12 +111,19 @@ const BookingFlowPage: React.FC = () => {
                     </div>
                 </div>
             )}
-
+            {/*
+                Se lo step è confirm mostro il componente che mostra l'esito positivo
+                della prenotazione effettuata.
+            */}
             {
                 bookingFlowState.step === BOOKING_STEPS.confirm &&
                 <BookingFlowConfirmation flowState={bookingFlowState}/>
             }
-
+            {/*
+                Questo è un modale utilizzato nel caso in cui nei vari step si verifica un errore.
+                Serve per informare l'utente che qualcosa è andato storto e fornire un feedback
+                per risolvere e proseguire con la prenotazione.
+            */}
             <AppModal
                 open={bookingFlowState.showErrorModal}
                 onClose={() => setBookingFlowState(prevState => ({
